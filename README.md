@@ -11,7 +11,7 @@ It's originaly initiated to enable subscription to a spinning event with a maxim
 <li>close the subscription on a certain date</li>
 </ul>
 
-On the subscription page a list of the total of subscribers is shown, with their corresponding number. The numbers do not have to follow up on each other. There is a possibility that someone who subscribed at the last moment gets number 2 and is asured of getting in on the program, while an early subscriber got numer 88 and has to wat if no more than 35 subscribers join the subscrition. After closing the subscrition period the list indicates all given numbers with the name of the sub scriber in an ascending list. In my example the first 35 subscribers in that list will be able to join the group.
+On the subscription page a list of the total of subscribers is shown, with their corresponding number. The numbers do not have to follow up on each other, like in bingo. There is a possibility that someone who subscribed at the last moment gets number 2 and is asured of joining the group of spinners, while an early subscriber got numer 88 and has to wat if no more than 35 subscribers join the subscription. After closing the subscrition a list indicates all given numbers with the name of the sub scriber in an ascending order. In the case of my example the first 35 subscribers in that list will be able to join the group of spinners.
 
 If an email adres already subscribed it's not able to get a second subscription
 
