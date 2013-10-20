@@ -38,44 +38,48 @@
 		 * register scripts used by the plugin
 		*/
 		
-		add_action( 'wp_enqueue_scripts', 'gyn_scripts' );
-		
-		function gyn_scripts() {
-			// load the wp included jquery
-			wp_enqueue_script('jquery');
-			
-			// load bootstrap_js library from CDN in the footer area
-			//wp_register_script( 'bootstrap_js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js' , array('jquery') , false, true);
-			//wp_enqueue_script( 'bootstrap_js' );
-			
-		}
-		
-		/**
-		 * register styles for the plugin
-		*/
-		
-		add_action('wp_enqueue_scripts', 'gyn_styles');
-		
-		function gyn_styles() {
-			// load bootstrap_css 2.3.2 file from CDN
-			wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
-			wp_enqueue_style( 'bootstrap_css' );
-			
-			wp_register_style( 'fontawesome_css' , '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css' );
-			wp_enqueue_style( 'fontawesome_css' );
-			
-			// load bootstrap_css 3.0.0 file from CDN
-			//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css' );
-			//wp_enqueue_style( 'bootstrap_css' );
-						
-			wp_register_style( 'gyn_styles', plugins_url('css/gyn_styles.css', __FILE__) );
-			wp_enqueue_style( 'gyn_styles' );
-		}
-		
-		
 	//}
 	// on activation of the plugin call this function
 	//register_activation_hook( __FILE__ , 'gyn_activation' );
+		
+	add_action( 'wp_enqueue_scripts', 'gyn_scripts' );
+	
+	function gyn_scripts() {
+		// load the wp included jquery
+		wp_enqueue_script('jquery');
+		
+		// load gyn_js scripts
+		wp_register_script( 'gyn_js', plugins_url('js/gyn_js.js', __FILE__) , array('jquery') , false, true);
+		wp_enqueue_script( 'gyn_js' );
+		
+		// load bootstrap_js library from CDN in the footer area
+		//wp_register_script( 'bootstrap_js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js' , array('jquery') , false, true);
+		//wp_enqueue_script( 'bootstrap_js' );
+		
+	}
+	
+	/**
+	 * register styles for the plugin
+	*/
+	
+	add_action('wp_enqueue_scripts', 'gyn_styles');
+	
+	function gyn_styles() {
+		// load bootstrap_css 2.3.2 file from CDN
+		wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
+		wp_enqueue_style( 'bootstrap_css' );
+		
+		wp_register_style( 'fontawesome_css' , '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css' );
+		wp_enqueue_style( 'fontawesome_css' );
+		
+		// load bootstrap_css 3.0.0 file from CDN
+		//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css' );
+		//wp_enqueue_style( 'bootstrap_css' );
+					
+		wp_register_style( 'gyn_styles', plugins_url('css/gyn_styles.css', __FILE__) );
+		wp_enqueue_style( 'gyn_styles' );
+	}
+		
 	
 	/**
 	 * functions that runs at de-activation of the plugin
@@ -97,9 +101,28 @@
 	*/
 	
 	function display_gyn() {
-		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) ) {
-			$gyn_variables = $_POST['gyn_value'];
-			unset($_POST['gyn_value']);
+		// use this variable to set a state to the form when it is send
+		$form_to_show = -1;
+		
+		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && isset( $_POST['gyn_value'] ) ) {
+			// save POST variables in an array
+			if ( !isset( $gyn_variables) ) {
+				$gyn_variables = $_POST['gyn_value'];
+				unset( $_POST['gyn_value'] );
+			}
+			// check if the email is valid
+			if ( is_email( $gyn_variables[1] ) && !isset( $gyn_user_check[0] ) ) {
+				// generate a unique number and at the same time check if the email is not already in the database
+				$gyn_user_check = gyn_generate_unique_number();
+				
+				$form_to_show = $gyn_user_check[1];
+			} elseif ( isset( $gyn_user_check[0] ) ) {
+				$form_to_show = 1;
+			} else {
+				$form_to_show = 2;
+			}
+		}
+		if ( $form_to_show == 1 ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">This is your number</h3>
@@ -117,10 +140,53 @@
 						</tr>
 						<tr>
 							<th><label for="number">Your number</label></th>
-							<td>' . $gyn_variables[2] . '</td>
+							<td>' . $gyn_user_check[0] . '</td>
 						</tr>
 					</tbody>
 				</table>
+				</div>
+			</div>';
+		} elseif ( $form_to_show == 2 ) {
+			echo '<script>
+				$( document ).ready(function() {
+			    $( "#email" ).focus();
+			});
+			</script>';
+			
+			$html = '<div class="row-fluid">
+				<div class="header">
+					<h3 class="text-success">Get your number</h3>
+				</div>
+				<div class="span12">
+				<form action="" name="send_number" method="post" >
+				<div class="header">
+					<h3 class="text-error">There seems to be something wrong with your email</h3>
+				</div>
+				<div class="span12">
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<th><label for="name">Name</label></th>
+							<td>' . $gyn_variables[0] . '
+							<input id="name" type="hidden" name="gyn_value[]" value="' . $gyn_variables[0] . '" />
+							</td>
+						</tr>
+						<tr class="error">
+							<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
+							<td><input id="email" type="text" name="gyn_value[]" class="span12 error" value="' . $gyn_variables[1] . '" /></td>
+						</tr>
+							<tr>
+								<th><label for="number">Retrieve your number</label></th>
+								<td><button type="submit" class="btn btn-inverse btn-block">Try again <i class="icon-gift icon-white"></i> </button>
+								<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" />
+							</tr>
+							<tr>
+								<th></th>
+								<td><i class="icon-asterisk"></i> In order to get your number you must share a valid email.</td>
+							</tr>
+						</tbody>
+					</table>
+					</form>
 				</div>
 			</div>';
 		} else {
@@ -129,7 +195,7 @@
 						<h3 class="text-success">Get your number</h3>
 					</div>
 					<div class="span12">
-					<form action="" name="send_number" method="post">
+					<form action="" name="send_number" method="post" onsubmit="return validateForm()" >
 					<table class="table table-bordered">
 						<tbody>
 							<tr>
@@ -144,7 +210,6 @@
 								<th><label for="number">Retrieve your number</label></th>
 								<td><button type="submit" class="btn btn-inverse btn-block">Send me my number <i class="icon-gift icon-white"></i> </button>
 								<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
-								<input type="hidden" name="gyn_value[]" value="' . generate_unique_number() . '" /></td>
 							</tr>
 							<tr>
 								<th></th>
