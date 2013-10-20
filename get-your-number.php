@@ -100,10 +100,7 @@
 	 * Page content submitted to posts or pages by the shortcode [gyn/]
 	*/
 	
-	function display_gyn() {
-		// use this variable to set a state to the form when it is send
-		$form_to_show = -1;
-		
+	function display_gyn() {		
 		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && isset( $_POST['gyn_value'] ) ) {
 			// save POST variables in an array
 			if ( !isset( $gyn_variables) ) {
@@ -111,10 +108,10 @@
 				unset( $_POST['gyn_value'] );
 			}
 			// check if the email is valid
-			if ( is_email( $gyn_variables[1] ) && !isset( $gyn_user_check[0] ) ) {
+			if ( is_email( $gyn_variables[1] ) && !isset( $gyn_given_number ) ) {
 				// generate a unique number and at the same time check if the email is not already in the database
 				$gyn_user_check = gyn_generate_unique_number();
-				
+				$gyn_given_number = $gyn_user_check[0];
 				$form_to_show = $gyn_user_check[1];
 			} elseif ( isset( $gyn_user_check[0] ) ) {
 				$form_to_show = 1;
@@ -122,7 +119,7 @@
 				$form_to_show = 2;
 			}
 		}
-		if ( $form_to_show == 1 ) {
+		if ( isset( $form_to_show ) && $form_to_show == 1 ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">This is your number</h3>
@@ -140,13 +137,13 @@
 						</tr>
 						<tr>
 							<th><label for="number">Your number</label></th>
-							<td>' . $gyn_user_check[0] . '</td>
+							<td>' . $gyn_given_number . '</td>
 						</tr>
 					</tbody>
 				</table>
 				</div>
 			</div>';
-		} elseif ( $form_to_show == 2 ) {
+		} elseif (  isset( $form_to_show ) && $form_to_show == 2 ) {
 			echo '<script>
 				$( document ).ready(function() {
 			    $( "#email" ).focus();
