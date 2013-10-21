@@ -54,7 +54,11 @@
 		wp_register_script( 'gyn_js', plugins_url('js/gyn_js.js', __FILE__) , array('jquery') , false, true);
 		wp_enqueue_script( 'gyn_js' );
 		
-		// load bootstrap_js library from CDN in the footer area
+		// load jqBootstrapValidation_js scripts
+		wp_register_script( 'bootstrap_validation_js', plugins_url('js/jqBootstrapValidation.js', __FILE__) , array('jquery') , false, true);
+		wp_enqueue_script( 'bootstrap_validation_js' );
+		
+		// load bootstrap_js 3.0.0 library from CDN in the footer area
 		//wp_register_script( 'bootstrap_js', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js' , array('jquery') , false, true);
 		//wp_enqueue_script( 'bootstrap_js' );
 		
@@ -103,36 +107,8 @@
 	*/
 	
 	function display_gyn() {	
-		$gyn_debug = '';
-		
-		if ( !isset( $gyn_the_number ) || $gyn_the_number <= 0 ) {
-			if ( isset( $_POST['gyn_form_value'][1] ) ) {
-				$gyn_email_valid = gyn_check_email( $_POST['gyn_form_value'][1]);	
-				if ( !isset( $gyn_the_number ) ) {
-						$gyn_the_number = $_POST['gyn_form_value'][2];
-				}
-				$gyn_debug .= 'end: if isset $gyn_email_valid = ' . $gyn_email_valid . ' en $gyn_the_number = ' . $gyn_the_number . '<br />';
-			}
-		}
-		
-		if ( isset( $gyn_email_valid ) && $gyn_email_valid == 1 && $gyn_the_number <= 0 ) {
-			// generate a unique number
-			$gyn_the_number = gyn_generate_unique_number();	
-			$gyn_form_to_show = 1;
-			$gyn_debug .= 'in if waar $gyn_email_valid = ' . $gyn_email_valid . ' en $gyn_the_number = ' . $gyn_the_number. '<br />';
-		} elseif ( isset( $gyn_email_valid ) && $gyn_email_valid == 0 ) {
-			$gyn_form_to_show = 2;
-			$gyn_debug .= 'in elseif waar $gyn_email_valid = ' . $gyn_email_valid . '<br />';
-		} elseif ( isset( $gyn_email_valid ) && $gyn_email_valid == 1 && $gyn_the_number > 0 ) {
-			$gyn_form_to_show = 1;
-			$gyn_debug .= 'in elseif waar $gyn_email_valid = ' . $gyn_email_valid . ' en $gyn_the_number niet meer 0 = ' . $gyn_the_number. '<br />';
-		} else {
-			$gyn_form_to_show = NULL;
-			$gyn_debug .= 'fisrt load of page<br />';
-		}
-		
-
-		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && isset( $gyn_form_to_show ) && $gyn_form_to_show == 1 ) {
+	
+		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">This is your number</h3>
@@ -150,58 +126,17 @@
 						</tr>
 						<tr>
 							<th><label for="number">Your number</label></th>
-							<td>' . $gyn_the_number . '</td>
+							<td>' . gyn_generate_unique_number() . '</td>
 						</tr>
 					</tbody>
 				</table>
 				</div>
 			</div>';
-		} elseif (  isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && isset( $gyn_form_to_show ) && $gyn_form_to_show == 2 ) {
-			echo '<script>
-				$( document ).ready(function() {
-			    $( "#email" ).focus();
-			});
-			</script>';
-			
-			$html = '<div class="row-fluid">
-				<div class="header">
-					<h3 class="text-success">Get your number</h3>
-				</div>
-				<div class="span12">
-				<form action="" id="gyn_form" name="send_number" method="post" >
-				<div class="header">
-					<h3 class="text-error">There seems to be something wrong with your email</h3>
-				</div>
-				<div class="span12">
-				<table class="table table-bordered">
-					<tbody>
-						<tr>
-							<th><label for="name">Name</label></th>
-							<td>' . $_POST['gyn_form_value'][0] . '
-							<input id="name" type="hidden" name="gyn_form_value[]" value="' . $_POST['gyn_form_value'][0] . '" />
-							</td>
-						</tr>
-						<tr class="error">
-							<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
-							<td><input id="email" type="text" name="gyn_form_value[]" class="span12 error" value="' . $_POST['gyn_form_value'][1] . '" /></td>
-						</tr>
-							<tr>
-								<th><label for="number">Retrieve your number</label></th>
-								<td><button type="submit" class="btn btn-inverse btn-block">Try again <i class="icon-gift icon-white"></i> </button>
-								<input type="hidden" name="nonce_field" value="' . $_POST['nonce_field'] . '" />
-								<input type="hidden" name="gyn_form_value[]" value="0" /></td>
-							</tr>
-							<tr>
-								<th></th>
-								<td><i class="icon-asterisk"></i> In order to get your number you must share a valid email.</td>
-							</tr>
-						</tbody>
-					</table>
-					</form>
-				</div>
-			</div>';
 		} else {
-			$html = '<div class="row-fluid">
+			$html = '<script>
+					  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );
+					</script>
+					<div class="row-fluid">
 					<div class="header">
 						<h3 class="text-success">Get your number</h3>
 					</div>
@@ -211,12 +146,12 @@
 						<tbody>
 							<tr>
 								<th><label for="name">Name <i class="icon-asterisk"></label></th>
-								<td><input id="name" type="text" name="gyn_form_value[]" class="span12" /></i></td>
+								<td><input id="name" type="text" name="gyn_form_value[]" class="span12" required /></i></td>
 							</tr>
 							<tr>
 								<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
-								<td><input id="email" type="text" name="gyn_form_value[]" class="span12" /></td>
-							</tr>
+								<td><input id="email" type="email" name="gyn_form_value[]" class="span12" required /></td>
+							</tr> 
 							<tr>
 								<th><label for="number">Retrieve your number</label></th>
 								<td><button type="submit" class="btn btn-inverse btn-block">Send me my number <i class="icon-gift icon-white"></i> </button>
@@ -234,7 +169,6 @@
 				</div>';
 		}
 		echo $html;
-		echo $gyn_debug;
 	}
 	// define the shortcode for the plugin
 	add_shortcode("gyn", "display_gyn");

@@ -1,5 +1,5 @@
 // JavaScript Document
-
+/*
 function validateForm() {
 	var x=document.forms["send_number"]["name"].value;
 	if (x==null || x=="")  {
@@ -8,3 +8,4 @@ function validateForm() {
 		return false;
 	}
 }
+*/
