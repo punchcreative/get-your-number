@@ -106,8 +106,7 @@
 	 * Page content submitted to posts or pages by the shortcode [gyn/]
 	*/
 	
-	function display_gyn() {	
-	
+	function display_gyn() {		
 		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
@@ -126,7 +125,7 @@
 						</tr>
 						<tr>
 							<th><label for="number">Your number</label></th>
-							<td>' . gyn_generate_unique_number() . '</td>
+							<td>' . $_POST['gyn_form_value'][2] . '</td>
 						</tr>
 					</tbody>
 				</table>
@@ -156,7 +155,8 @@
 								<th><label for="number">Retrieve your number</label></th>
 								<td><button type="submit" class="btn btn-inverse btn-block">Send me my number <i class="icon-gift icon-white"></i> </button>
 								<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
-								<input type="hidden" name="gyn_form_value[]" value="-1" /></td>
+								<input type="hidden" name="gyn_form_value[]" value="' . gyn_generate_unique_number() . '" /></td>
+
 							</tr>
 							<tr>
 								<th></th>
