@@ -16,13 +16,23 @@ function gyn_check_email($email_to_check) {
 	
 }
 
-function gyn_mailer($name,$email,$number,$from_name,$from_email,$eventname) {
+function gyn_mailer($name,$email,$number,$from_name,$eventname) {
 	// send mail to the subscriber
-	$headers[] = 'From: ' .$from_name . ' <' . $from_email . '>';
-	$headers[] = 'Cc: ' .$from_name . ' <' . $from_email . '>';
+	$gyn_admin_email = get_option( 'admin_email' );
+	$headers[] = 'From: ' .$from_name . ' <' . $gyn_admin_email . '>';
+	$headers[] = 'Cc: ' .$from_name . ' <' . $gyn_admin_email . '>';
 	$to = $name . '<' . $email .'>';
-	$subject = 'Your ' . $eventname .  'subscription number';
-	$message = "Dear " . $name . "\n\nThis your subsctiption number for the event " . $eventname . " is " . $number . "\n\nThanks for subscribing.\nYou will soon be informed is you had a lucky number.\n\nBest regards,\n" . $from_name;
-	wp_mail( $to, $subject, $message, $headers );
+	$subject = 'Your subscription number is ' . $number;
+	$message = "Dear " . $name . ",\n\n" . $number . " is your subscription number for the event " . $eventname . ".\n\nYou will soon be informed if you have a lucky number.\n\nThank you for subscribing.";
+	
+	// send the mail and set $gyn_mail with a boolean to test sending went well
+	$gyn_mail = wp_mail( $to, $subject, $message, $headers );
+	
+	if ( $gyn_mail ) {
+		$gyn_mail_message = 'An email has been sent to you to confirm your subscription';
+	} else {
+		$gyn_mail_message = 'Sending an email failed, please remember your number';
+	}
+	return $gyn_mail_message;
 }
 ?>

@@ -108,6 +108,10 @@
 	
 	function display_gyn() {		
 		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) ) {
+			// send an emai to subscriber and administrator
+			if ( !isset( $gyn_mail_check ) ) {
+				$gyn_mail_check = gyn_mailer($_POST['gyn_form_value'][0],$_POST['gyn_form_value'][1],$_POST['gyn_form_value'][2],'Get your number admin','Test event');
+			}
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">This is your number</h3>
@@ -129,16 +133,12 @@
 						</tr>
 						<tr>
 							<th></th>
-							<td>An email has been sent to you.</td>
+							<td>' . $gyn_mail_check . '</td>
 						</tr>
 					</tbody>
 				</table>
 				</div>
 			</div>';
-			// send an emai to subscriber and administrator
-			// this shoud not happen here, but for the moment it's oké
-			$gyn_admin_email = get_option( 'admin_email' );
-			gyn_mailer($_POST['gyn_form_value'][0],$_POST['gyn_form_value'][1],$_POST['gyn_form_value'][2],'Get your number admin',$gyn_admin_email,'Test');
 		} else {
 			$html = '<script>
 					  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );
