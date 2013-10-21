@@ -22,6 +22,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+	
 	/**
 	 * include all php files in subfolder /inc
 	*/
@@ -101,25 +102,35 @@
 	*/
 	
 	function display_gyn() {		
-		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && isset( $_POST['gyn_value'] ) ) {
+		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && !isset( $gyn_given_number ) ) {
+			
 			// save POST variables in an array
 			if ( !isset( $gyn_variables) ) {
+				
 				$gyn_variables = $_POST['gyn_value'];
 				unset( $_POST['gyn_value'] );
+				
 			}
 			// check if the email is valid
-			if ( is_email( $gyn_variables[1] ) && !isset( $gyn_given_number ) ) {
+			if ( is_email( $gyn_variables[1] ) && !isset($gyn_checked_email) || $gyn_checked_email != 1 ) {
+				
 				// generate a unique number and at the same time check if the email is not already in the database
 				$gyn_user_check = gyn_generate_unique_number();
 				$gyn_given_number = $gyn_user_check[0];
 				$form_to_show = $gyn_user_check[1];
+				$gyn_checked_email = $gyn_user_check[1];
+				
 			} elseif ( isset( $gyn_user_check[0] ) ) {
+				
 				$form_to_show = 1;
+				
 			} else {
+				
 				$form_to_show = 2;
+				
 			}
 		}
-		if ( isset( $form_to_show ) && $form_to_show == 1 ) {
+		if ( isset( $form_to_show ) && $form_to_show == 1  && isset($gyn_checked_email) && $gyn_checked_email == 1 ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">This is your number</h3>
@@ -175,7 +186,7 @@
 							<tr>
 								<th><label for="number">Retrieve your number</label></th>
 								<td><button type="submit" class="btn btn-inverse btn-block">Try again <i class="icon-gift icon-white"></i> </button>
-								<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" />
+								<input type="hidden" name="nonce_field" value="' . $_POST['nonce_field'] . '" />
 							</tr>
 							<tr>
 								<th></th>
