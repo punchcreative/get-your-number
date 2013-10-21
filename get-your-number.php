@@ -127,10 +127,18 @@
 							<th><label for="number">Your number</label></th>
 							<td>' . $_POST['gyn_form_value'][2] . '</td>
 						</tr>
+						<tr>
+							<th></th>
+							<td>An email has been sent to you.</td>
+						</tr>
 					</tbody>
 				</table>
 				</div>
 			</div>';
+			// send an emai to subscriber and administrator
+			// this shoud not happen here, but for the moment it's oké
+			$gyn_admin_email = get_option( 'admin_email' );
+			gyn_mailer($_POST['gyn_form_value'][0],$_POST['gyn_form_value'][1],$_POST['gyn_form_value'][2],'Get your number admin',$gyn_admin_email,'Test');
 		} else {
 			$html = '<script>
 					  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );

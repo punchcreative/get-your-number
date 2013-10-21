@@ -16,7 +16,13 @@ function gyn_check_email($email_to_check) {
 	
 }
 
-function gyn_mailer() {
-	// send mail to the registrated participant
+function gyn_mailer($name,$email,$number,$from_name,$from_email,$eventname) {
+	// send mail to the subscriber
+	$headers[] = 'From: ' .$from_name . ' <' . $from_email . '>';
+	$headers[] = 'Cc: ' .$from_name . ' <' . $from_email . '>';
+	$to = $name . '<' . $email .'>';
+	$subject = 'Your ' . $eventname .  'subscription number';
+	$message = "Dear " . $name . "\n\nThis your subsctiption number for the event " . $eventname . " is " . $number . "\n\nThanks for subscribing.\nYou will soon be informed is you had a lucky number.\n\nBest regards,\n" . $from_name;
+	wp_mail( $to, $subject, $message, $headers );
 }
 ?>
