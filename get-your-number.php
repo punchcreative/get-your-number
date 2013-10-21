@@ -23,6 +23,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 	
+
 	/**
 	 * include all php files in subfolder /inc
 	*/
@@ -101,36 +102,37 @@
 	 * Page content submitted to posts or pages by the shortcode [gyn/]
 	*/
 	
-	function display_gyn() {		
-		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && !isset( $gyn_given_number ) ) {
-			
-			// save POST variables in an array
-			if ( !isset( $gyn_variables) ) {
-				
-				$gyn_variables = $_POST['gyn_value'];
-				unset( $_POST['gyn_value'] );
-				
-			}
-			// check if the email is valid
-			if ( is_email( $gyn_variables[1] ) && !isset($gyn_checked_email) || $gyn_checked_email != 1 ) {
-				
-				// generate a unique number and at the same time check if the email is not already in the database
-				$gyn_user_check = gyn_generate_unique_number();
-				$gyn_given_number = $gyn_user_check[0];
-				$form_to_show = $gyn_user_check[1];
-				$gyn_checked_email = $gyn_user_check[1];
-				
-			} elseif ( isset( $gyn_user_check[0] ) ) {
-				
-				$form_to_show = 1;
-				
-			} else {
-				
-				$form_to_show = 2;
-				
+	function display_gyn() {	
+		$gyn_debug = '';
+		
+		if ( !isset( $gyn_the_number ) || $gyn_the_number <= 0 ) {
+			if ( isset( $_POST['gyn_form_value'][1] ) ) {
+				$gyn_email_valid = gyn_check_email( $_POST['gyn_form_value'][1]);	
+				if ( !isset( $gyn_the_number ) ) {
+						$gyn_the_number = $_POST['gyn_form_value'][2];
+				}
+				$gyn_debug .= 'end: if isset $gyn_email_valid = ' . $gyn_email_valid . ' en $gyn_the_number = ' . $gyn_the_number . '<br />';
 			}
 		}
-		if ( isset( $form_to_show ) && $form_to_show == 1  && isset($gyn_checked_email) && $gyn_checked_email == 1 ) {
+		
+		if ( isset( $gyn_email_valid ) && $gyn_email_valid == 1 && $gyn_the_number <= 0 ) {
+			// generate a unique number
+			$gyn_the_number = gyn_generate_unique_number();	
+			$gyn_form_to_show = 1;
+			$gyn_debug .= 'in if waar $gyn_email_valid = ' . $gyn_email_valid . ' en $gyn_the_number = ' . $gyn_the_number. '<br />';
+		} elseif ( isset( $gyn_email_valid ) && $gyn_email_valid == 0 ) {
+			$gyn_form_to_show = 2;
+			$gyn_debug .= 'in elseif waar $gyn_email_valid = ' . $gyn_email_valid . '<br />';
+		} elseif ( isset( $gyn_email_valid ) && $gyn_email_valid == 1 && $gyn_the_number > 0 ) {
+			$gyn_form_to_show = 1;
+			$gyn_debug .= 'in elseif waar $gyn_email_valid = ' . $gyn_email_valid . ' en $gyn_the_number niet meer 0 = ' . $gyn_the_number. '<br />';
+		} else {
+			$gyn_form_to_show = NULL;
+			$gyn_debug .= 'fisrt load of page<br />';
+		}
+		
+
+		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && isset( $gyn_form_to_show ) && $gyn_form_to_show == 1 ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">This is your number</h3>
@@ -140,21 +142,21 @@
 					<tbody>
 						<tr>
 							<th><label for="name">Name</label></th>
-							<td>' . $gyn_variables[0] . '</td>
+							<td>' . $_POST['gyn_form_value'][0] . '</td>
 						</tr>
 						<tr>
 							<th><label for="email">Email</i></label></th>
-							<td>' . $gyn_variables[1] . '</td>
+							<td>' . $_POST['gyn_form_value'][1] . '</td>
 						</tr>
 						<tr>
 							<th><label for="number">Your number</label></th>
-							<td>' . $gyn_given_number . '</td>
+							<td>' . $gyn_the_number . '</td>
 						</tr>
 					</tbody>
 				</table>
 				</div>
 			</div>';
-		} elseif (  isset( $form_to_show ) && $form_to_show == 2 ) {
+		} elseif (  isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && isset( $gyn_form_to_show ) && $gyn_form_to_show == 2 ) {
 			echo '<script>
 				$( document ).ready(function() {
 			    $( "#email" ).focus();
@@ -166,7 +168,7 @@
 					<h3 class="text-success">Get your number</h3>
 				</div>
 				<div class="span12">
-				<form action="" name="send_number" method="post" >
+				<form action="" id="gyn_form" name="send_number" method="post" >
 				<div class="header">
 					<h3 class="text-error">There seems to be something wrong with your email</h3>
 				</div>
@@ -175,18 +177,19 @@
 					<tbody>
 						<tr>
 							<th><label for="name">Name</label></th>
-							<td>' . $gyn_variables[0] . '
-							<input id="name" type="hidden" name="gyn_value[]" value="' . $gyn_variables[0] . '" />
+							<td>' . $_POST['gyn_form_value'][0] . '
+							<input id="name" type="hidden" name="gyn_form_value[]" value="' . $_POST['gyn_form_value'][0] . '" />
 							</td>
 						</tr>
 						<tr class="error">
 							<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
-							<td><input id="email" type="text" name="gyn_value[]" class="span12 error" value="' . $gyn_variables[1] . '" /></td>
+							<td><input id="email" type="text" name="gyn_form_value[]" class="span12 error" value="' . $_POST['gyn_form_value'][1] . '" /></td>
 						</tr>
 							<tr>
 								<th><label for="number">Retrieve your number</label></th>
 								<td><button type="submit" class="btn btn-inverse btn-block">Try again <i class="icon-gift icon-white"></i> </button>
 								<input type="hidden" name="nonce_field" value="' . $_POST['nonce_field'] . '" />
+								<input type="hidden" name="gyn_form_value[]" value="0" /></td>
 							</tr>
 							<tr>
 								<th></th>
@@ -203,21 +206,22 @@
 						<h3 class="text-success">Get your number</h3>
 					</div>
 					<div class="span12">
-					<form action="" name="send_number" method="post" onsubmit="return validateForm()" >
+					<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
 					<table class="table table-bordered">
 						<tbody>
 							<tr>
 								<th><label for="name">Name <i class="icon-asterisk"></label></th>
-								<td><input id="name" type="text" name="gyn_value[]" class="span12" /></i></td>
+								<td><input id="name" type="text" name="gyn_form_value[]" class="span12" /></i></td>
 							</tr>
 							<tr>
 								<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
-								<td><input id="email" type="text" name="gyn_value[]" class="span12" /></td>
+								<td><input id="email" type="text" name="gyn_form_value[]" class="span12" /></td>
 							</tr>
 							<tr>
 								<th><label for="number">Retrieve your number</label></th>
 								<td><button type="submit" class="btn btn-inverse btn-block">Send me my number <i class="icon-gift icon-white"></i> </button>
 								<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
+								<input type="hidden" name="gyn_form_value[]" value="-1" /></td>
 							</tr>
 							<tr>
 								<th></th>
@@ -230,6 +234,7 @@
 				</div>';
 		}
 		echo $html;
+		echo $gyn_debug;
 	}
 	// define the shortcode for the plugin
 	add_shortcode("gyn", "display_gyn");
@@ -247,14 +252,11 @@
 	}
 	
 	/**
-	 * form processing using nonce for protection
+	 * init vars and check $_POST vars
 	*/
 	
-	function process_form() {
-		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) ) {
-			
-		}
+	function gyn_set_variables() {
 	}
-	add_action( 'init', 'process_form' );
-
+	add_action( 'init', 'gyn_set_variables' );
+	
 ?>
