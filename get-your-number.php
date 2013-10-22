@@ -82,7 +82,7 @@
 			$new_options['gyn_version'] = '1.0';
 			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
 			$new_options['gyn_min_nr'] = '1';
-			$new_options['gyn_max_nr'] = '100';
+			$new_options['gyn_max_nr'] = '80';
 			$new_options['gyn_event_name'] = 'Try-out GYN';
 			add_option( 'gyn_options', $new_options );
 		} else {
@@ -117,7 +117,7 @@
                 <table width="100%" border="1">
                     <tr>
                         <th scope="row">Admin emial</th>
-                        <td><input type="text" name="gyn_admin_email" value="<?php echo esc_html( $options['gyn_admin_email'] ); ?>"/></td>
+                        <td><input type="text" name="gyn_admin_email" value="<?php echo $options['gyn_admin_email']; ?>"/></td>
                     </tr>
                     <tr>
                         <th scope="row">Start number</th>
@@ -129,7 +129,7 @@
                     </tr>
                     <tr>
                         <th scope="row">Event name</th>
-                        <td><input type="text" name="gyn_event_name" value="<?php echo esc_html( $options['gyn_event_name'] ); ?>"/></td>
+                        <td><input type="text" name="gyn_event_name" value="<?php echo $options['gyn_event_name']; ?>"/></td>
                     </tr>
                     <tr>
                         <th scope="row">&nbsp;</th>

@@ -58,11 +58,14 @@ function process_gyn_options() {
 	// Retrieve original plugin options array
 	$options = get_option( 'gyn_options' );
 	// Cycle through all text form fields and store their values in the options array
-	foreach ( array( 'gyn_options' ) as $option_name ) {
-		if ( isset( $_POST[$option_name] ) ) {
-			$options[$option_name] = sanitize_text_field( $_POST[$option_name] );
+	foreach ( $options as $key ) {
+		if ( isset( $_POST[$key] ) ) {
+			$options[$key] = $_POST[$key]; //sanitize_text_field( $_POST[$key] );
 		}
 	}
+
+	$options['gyn_event_name'] = 'test123';
+	update_option( 'gyn_options', $options );
 	
 	// Store updated options array to databaseupdate_option( 'gyn_options', $options );
 	// Redirect the page to the configuration form that was processed
