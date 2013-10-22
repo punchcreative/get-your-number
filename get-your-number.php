@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Get your number
  * Plugin URI: https://github.com/punchcreative/get-your-number
- * Description: A random number generator for subscribing to an event with a limited number of participants. It provides the possibility of attending to a limited event for subscribers, even if they are not the fisrt with subscribing. See the plugin site (github) for a more detailed description.
+ * Description: A random number generator for subscribing to an event with a limited number of participants. It provides the possibility of attending to a limited event for subscribers, even if they are not the fisrt with subscribing. See the plugin site (@github) for a more detailed description.
  * Version: 1.02 beta
  * Author: Erik Kroon | Punch Creative
  * Author URI: http://www.punchcreative.nl
@@ -27,25 +27,12 @@
 	/**
 	 * include all php files in subfolder /inc
 	*/
-	
 	foreach ( glob( plugin_dir_path( __FILE__ )."inc/*.php" ) as $file )
 	include_once $file;
-			
+	
 	/**
-	 * functions that runs at activation of the plugin
-	*/
-	
-	//function gyn_activation() {
-		/**
-		 * register scripts used by the plugin
-		*/
-		
-	//}
-	// on activation of the plugin call this function
-	//register_activation_hook( __FILE__ , 'gyn_activation' );
-		
-	add_action( 'wp_enqueue_scripts', 'gyn_scripts' );
-	
+	 * register scripts used by the plugin
+	*/			
 	function gyn_scripts() {
 		// load the wp included jquery
 		wp_enqueue_script('jquery');
@@ -63,13 +50,12 @@
 		//wp_enqueue_script( 'bootstrap_js' );
 		
 	}
+		
+	add_action( 'wp_enqueue_scripts', 'gyn_scripts' );
 	
 	/**
-	 * register styles for the plugin
-	*/
-	
-	add_action('wp_enqueue_scripts', 'gyn_styles');
-	
+	 * register styles used by the plugin
+	*/	
 	function gyn_styles() {
 		// load bootstrap_css 2.3.2 file from CDN
 		wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
@@ -85,27 +71,118 @@
 		wp_register_style( 'gyn_styles', plugins_url('css/gyn_styles.css', __FILE__) );
 		wp_enqueue_style( 'gyn_styles' );
 	}
-		
+	
+	add_action('wp_enqueue_scripts', 'gyn_styles');
+	
+	/**
+	 * functions that runs at activation of the plugin
+	*/
+	function gyn_activation() {
+		if ( get_option( 'gyn_options' ) === false ) {
+			$new_options['gyn_version'] = '1.0';
+			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
+			$new_options['gyn_min_nr'] = '1';
+			$new_options['gyn_max_nr'] = '100';
+			$new_options['gyn_event_name'] = 'Try-out GYN';
+			add_option( 'gyn_options', $new_options );
+		} else {
+			$existing_options = get_option( 'gyn_options' );
+			if ( $existing_options['gyn_version'] < 1.0 ) {
+				$existing_options['gyn_version'] = "1.0";
+				update_option( 'gyn_options', $existing_options );
+			}
+		}
+	}
+	// on activation of the plugin call this function
+	register_activation_hook( __FILE__ , 'gyn_activation' );	
+	
+	/**
+	 * Admin setting page html
+	*/
+	function gyn_config_page() {
+		// Retrieve plugin configuration options from database
+		$options = get_option( 'gyn_options' );
+		?>
+		<div id="gyn-general" class="wrap">
+            <h2>GYN settings | GYN version <?php echo $options['gyn_version']; ?></h2>
+            <?php
+            if ( isset( $_GET['message'] ) && $_GET['message'] == '1' ) {
+				?>
+				<div id='message' class='updated fade'><p><strong>Settings are saved</strong></p></div>
+			 <?php 
+			 }
+			 ?>
+            <form method="post" action="admin-post.php">
+                <input type="hidden" name="action" value="save_gyn_options" />
+                <table width="100%" border="1">
+                    <tr>
+                        <th scope="row">Admin emial</th>
+                        <td><input type="text" name="gyn_admin_email" value="<?php echo esc_html( $options['gyn_admin_email'] ); ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Start number</th>
+                        <td><input type="text" name="gyn_min_nr" value="<?php echo $options['gyn_min_nr']; ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">End number</th>
+                        <td><input type="text" name="gyn_max_nr" value="<?php echo $options['gyn_max_nr']; ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Event name</th>
+                        <td><input type="text" name="gyn_event_name" value="<?php echo esc_html( $options['gyn_event_name'] ); ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">&nbsp;</th>
+                        <td><input type="submit" value="Submit" class="button-primary"/></td>
+                    </tr>
+                </table>
+                <!-- Adding security through hidden referrer field -->
+                <?php wp_nonce_field( 'gyn_settings' ); ?>
+            </form>
+		</div>
+	<?php
+	}
+	
+	/**
+	 * Admin setting for this plugin
+	*/
+	add_action('admin_menu', 'gyn_plugin_settings');
+
+	function gyn_plugin_settings() {
+		// add a settings menu item in the admin area
+		add_options_page( 'GYN Configuration', 'Get Your Number', 'manage_options', 'gyn-configuration', 'gyn_config_page' );
+	}
+	
+	/**
+	 * admin init function for saving settings
+	*/
+	function gyn_admin_init() {
+		add_action( 'admin_post_save_gyn_options', 'process_gyn_options' );
+	}
+	add_action( 'admin_init', 'gyn_admin_init' );
 	
 	/**
 	 * functions that runs at de-activation of the plugin
 	*/
 	
 	function gyn_deactivation() {
-		// run uninstall script
-		include( $dir . 'inc/uninstall.php');
+		// run uninstall script when the plugin is deleted by an admin
+		
 	}
 	// on de-activation of the plugin call this function
 	register_deactivation_hook( __FILE__ , 'gyn_deactivation' );
 
 	/**
-	 * add admin admin menu
+	 * init vars
 	*/
+		function gyn_init_variables() {
+		
+	}
+	add_action( 'init', 'gyn_init_variables' );
 		
 	/**
 	 * Page content submitted to posts or pages by the shortcode [gyn/]
 	*/
-	
 	function display_gyn() {		
 		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) ) {
 			// send an emai to subscriber and administrator
@@ -180,25 +257,4 @@
 	}
 	// define the shortcode for the plugin
 	add_shortcode("gyn", "display_gyn");
-	
-	/**
-	 * Admin setting for this plugin
-	*/
-	
-	add_action('admin_menu', 'gyn_plugin_settings');
-
-	function gyn_plugin_settings() {
-	
-		add_menu_page('GYN Settings', 'GYN Settings', 'administrator', 'gyn_settings', 'gyn_display_settings');
-	
-	}
-	
-	/**
-	 * init vars and check $_POST vars
-	*/
-	
-	function gyn_set_variables() {
-	}
-	add_action( 'init', 'gyn_set_variables' );
-	
 ?>
