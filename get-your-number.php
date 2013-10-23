@@ -57,16 +57,20 @@
 	 * register styles used by the plugin
 	*/	
 	function gyn_styles() {
-		// load bootstrap_css 2.3.2 file from CDN
-		wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
-		wp_enqueue_style( 'bootstrap_css' );
-		
+		$style = 'bootstrap';
+		if( ( ! wp_style_is( $style, 'queue' ) ) && ( ! wp_style_is( $style, 'done' ) ) ) {
+			//queue up bootstrap_css 2.3.2 file from CDN
+			wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
+			wp_enqueue_style( 'bootstrap_css' );
+			
+			// load bootstrap_css 3.0.0 file from CDN
+			//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css' );
+			//wp_enqueue_style( 'bootstrap_css' );
+		}
+				
 		wp_register_style( 'fontawesome_css' , '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css' );
 		wp_enqueue_style( 'fontawesome_css' );
-		
-		// load bootstrap_css 3.0.0 file from CDN
-		//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css' );
-		//wp_enqueue_style( 'bootstrap_css' );
+
 					
 		wp_register_style( 'gyn_styles', plugins_url('css/gyn_styles.css', __FILE__) );
 		wp_enqueue_style( 'gyn_styles' );
@@ -114,7 +118,7 @@
 			 ?>
             <form method="post" action="admin-post.php">
                 <input type="hidden" name="action" value="save_gyn_options" />
-                <table width="100%" border="1">
+                <table border="1" celpadding="0" celspacing="0" class="table table-bordered span12">
                     <tr>
                         <th scope="row">Admin emial</th>
                         <td><input type="text" name="gyn_admin_email" value="<?php echo $options['gyn_admin_email']; ?>"/></td>

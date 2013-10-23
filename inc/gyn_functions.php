@@ -33,7 +33,7 @@ function gyn_mailer($name,$email,$number,$from_name,$eventname) {
 	$headers[] = 'Cc: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
 	$to = $name . '<' . $email .'>';
 	$subject = 'Your subscription number is ' . $number;
-	$message = "Dear " . $name . ",\n\n" . $number . " is your subscription number for the event " . $eventname . ".\n\nYou will soon be informed if you have a lucky number.\nRegistration details:\nName: " . $name . "\n\nThank you for subscribing.";
+	$message = "Dear " . $name . ",\n\n" . $number . " is your subscription number for the event " . $eventname . ".\n\nYou will soon be informed if you have a lucky number.\nRegistration:\nName: " . $name . "\nEmail: " . $email . "\nNumber: " . $number . "\n\nThank you for subscribing.";
 	
 	// send the mail and set $gyn_mail with a boolean to test sending went well
 	$gyn_mail = wp_mail( $to, $subject, $message, $headers );
@@ -58,13 +58,13 @@ function process_gyn_options() {
 	// Retrieve original plugin options array
 	$options = get_option( 'gyn_options' );
 	// Cycle through all text form fields and store their values in the options array
-	foreach ( $options as $key ) {
+	foreach ( $options as $key => $value ) {
 		if ( isset( $_POST[$key] ) ) {
 			$options[$key] = $_POST[$key]; //sanitize_text_field( $_POST[$key] );
 		}
 	}
 
-	$options['gyn_event_name'] = 'test123';
+	//$options['gyn_event_name'] = 'test123';
 	update_option( 'gyn_options', $options );
 	
 	// Store updated options array to databaseupdate_option( 'gyn_options', $options );
