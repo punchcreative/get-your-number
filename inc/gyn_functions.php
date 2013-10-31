@@ -52,20 +52,20 @@ function gyn_mailer($name,$email,$number,$from_name,$eventname) {
 	$headers[] = 'From: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
 	$headers[] = 'Cc: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
 	$to = $name . '<' . $email .'>';
-	$subject = 'Your subscription number is ' . $number;
+	$subject = _e('Your subscription number is ', 'gyn') . $number;
 	
-	$message = "Dear " . $name . ",\n\n" . $number . " is your subscription number for the event " . $eventname . ".\n\nYou will soon be informed if you have a lucky number.\nRegistration:\nName: " . $name . "\nEmail: " . $email . "\nNumber: " . $number . "\n\nThank you for subscribing.";
+	$message = _e('Dear', 'gyn') . " " . $name . ",\n\n" . $number . " " . _e('is your subscription number for the event', 'gyn') . " " . $eventname . ".\n\n" . _e('You will soon be informed if you have a lucky number', 'gyn'). "\n" . _e('Registration', 'gyn') . ":\n" . _e('Name', 'gyn') . ": " . $name . "\n" . _e('Email', 'gyn') . ": " . $email . "\n" . _e('Number', 'gyn') . ": " . $number . "\n\n" . _e('Thank you for subscribing', 'gyn') . ".";
 	
 	// send the mail and set $gyn_mail with a boolean to test sending went well
 	$gyn_mail = wp_mail( $to, $subject, $message, $headers );
 	
 	if ( $gyn_mail ) {
 		
-		$gyn_mail_message = 'An email has been sent to you to confirm your subscription';
+		$gyn_mail_message = _e('An email has been sent to you to confirm your subscription', 'gyn');
 		
 	} else {
 		
-		$gyn_mail_message = 'Sending an email failed, please remember your number';
+		$gyn_mail_message = _e('Sending an email failed, please remember your number', 'gyn');
 		
 	}
 	
@@ -78,7 +78,7 @@ function gyn_mailer($name,$email,$number,$from_name,$eventname) {
 function process_gyn_options() {
 	
 	// Check user security level
-	if ( !current_user_can( 'manage_options' ) ) wp_die( 'No permission for you to change options' );
+	if ( !current_user_can( 'manage_options' ) ) wp_die( _e('No permission for you to change options', 'gyn') );
 	
 	// Check nonce field created in configuration form
 	check_admin_referer( 'gyn_settings' );

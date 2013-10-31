@@ -116,11 +116,11 @@
 		$options = get_option( 'gyn_options' );
 		?>
 		<div id="gyn-general" class="wrap">
-            <h2>GYN settings | GYN version <?php echo $options['gyn_version']; ?></h2>
+            <h2><?php _e('GYN settings | GYN version', 'gyn') . " " . $options['gyn_version']; ?></h2>
             <?php
             if ( isset( $_GET['message'] ) && $_GET['message'] == '1' ) {
 				?>
-				<div id='message' class='updated fade'><p><strong>Settings are saved</strong></p></div>
+				<div id='message' class='updated fade'><p><strong><?php _e('Settings are saved', 'gyn'); ?></strong></p></div>
 			 <?php 
 			 }
 			 ?>
@@ -128,24 +128,24 @@
                 <input type="hidden" name="action" value="save_gyn_options" />
                 <table border="1" celpadding="0" celspacing="0" class="table table-bordered span12">
                     <tr>
-                        <th scope="row">Admin emial</th>
+                        <th scope="row"><?php _e('Admin email', 'gyn'); ?></th>
                         <td><input type="text" name="gyn_admin_email" value="<?php echo $options['gyn_admin_email']; ?>"/></td>
                     </tr>
                     <tr>
-                        <th scope="row">Start number</th>
+                        <th scope="row"><?php _e('Start number', 'gyn'); ?></th>
                         <td><input type="text" name="gyn_min_nr" value="<?php echo $options['gyn_min_nr']; ?>"/></td>
                     </tr>
                     <tr>
-                        <th scope="row">End number</th>
+                        <th scope="row"><?php _e('End number', 'gyn'); ?></th>
                         <td><input type="text" name="gyn_max_nr" value="<?php echo $options['gyn_max_nr']; ?>"/></td>
                     </tr>
                     <tr>
-                        <th scope="row">Event name</th>
+                        <th scope="row"><?php _e('Event name', 'gyn'); ?></th>
                         <td><input type="text" name="gyn_event_name" value="<?php echo $options['gyn_event_name']; ?>"/></td>
                     </tr>
                     <tr>
                         <th scope="row">&nbsp;</th>
-                        <td><input type="submit" value="Submit" class="button-primary"/></td>
+                        <td><input type="submit" value="<?php _e('Submit', 'gyn'); ?>" class="button-primary"/></td>
                     </tr>
                 </table>
                 <!-- Adding security through hidden referrer field -->
@@ -215,21 +215,21 @@
 		if ( isset($gyn_form_checked) ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
-					<h3 class="text-success">This is your number</h3>
+					<h3 class="text-success">' . __('This is your number', 'gyn') . '</h3>
 				</div>
 				<div class="span12">
 				<table class="table table-bordered">
 					<tbody>
 						<tr>
-							<th><label for="name">Name</label></th>
+							<th><label for="name">' . __('Name', 'gyn') . '</label></th>
 							<td>' . $_POST['gyn_form_value'][0] . '</td>
 						</tr>
 						<tr>
-							<th><label for="email">Email</i></label></th>
+							<th><label for="email">' . __('Email', 'gyn') . '</i></label></th>
 							<td>' . $_POST['gyn_form_value'][1] . '</td>
 						</tr>
 						<tr>
-							<th><label for="number">Your number</label></th>
+							<th><label for="number">' . __('Your number', 'gyn') . '</label></th>
 							<td>' . $_POST['gyn_form_value'][2] . '</td>
 						</tr>
 						<tr>
@@ -246,30 +246,30 @@
 				</script>
 				<div class="row-fluid">
 				<div class="header">
-					<h3 class="text-success">Get your number</h3>
+					<h3 class="text-success">' . __('Get your number', 'gyn') . '</h3>
 				</div>
 				<div class="span12">
 				<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
 				<table class="table table-bordered">
 					<tbody>
 						<tr>
-							<th><label for="name">Name <i class="icon-asterisk"></label></th>
+							<th><label for="name">' . __('Name', 'gyn') . ' <i class="icon-asterisk"></label></th>
 							<td><input id="name" type="text" name="gyn_form_value[]" class="span12" required /></i></td>
 						</tr>
 						<tr>
-							<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
+							<th><label for="email">' . __('Email', 'gyn') . ' <i class="icon-asterisk"></i></label></th>
 							<td><input id="email" type="email" name="gyn_form_value[]" class="span12" required /></td>
 						</tr> 
 						<tr>
-							<th><label for="number">Retrieve your number</label></th>
-							<td><button type="submit" class="btn btn-inverse btn-block">Send me my number <i class="icon-gift icon-white"></i> </button>
+							<th><label for="number">' . __('Retreive your number', 'gyn') . '</label></th>
+							<td><button type="submit" class="btn btn-inverse btn-block">' . __('Send me my number', 'gyn') . ' <i class="icon-gift icon-white"></i> </button>
 							<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
 							<input type="hidden" name="gyn_form_value[]" value="' . gyn_generate_unique_number() . '" /></td>
 
 						</tr>
 						<tr>
 							<th></th>
-							<td><i class="icon-asterisk"></i> In order to get your number you must share your name and email.</td>
+							<td><i class="icon-asterisk"></i> ' . __('In order to get your number you must share your name and email', 'gyn') . '.</td>
 						</tr>
 					</tbody>
 				</table>
