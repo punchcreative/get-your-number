@@ -3,7 +3,7 @@
  * Plugin Name: Get your number
  * Plugin URI: https://github.com/punchcreative/get-your-number
  * Description: A random number generator for subscribing to an event with a limited number of participants. It provides the possibility of attending to a limited event for subscribers, even if they are not the fisrt with subscribing. See the plugin site (@github) for a more detailed description.
- * Version: 1.02 beta
+ * Version: 1.03 dev
  * Author: Erik Kroon | Punch Creative
  * Author URI: http://www.punchcreative.nl
  * License: GPL2
@@ -83,17 +83,25 @@
 	*/
 	function gyn_activation() {
 		if ( get_option( 'gyn_options' ) === false ) {
+			
 			$new_options['gyn_version'] = '1.0';
 			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
 			$new_options['gyn_min_nr'] = '1';
 			$new_options['gyn_max_nr'] = '80';
 			$new_options['gyn_event_name'] = 'Try-out GYN';
+			
 			add_option( 'gyn_options', $new_options );
+			
 		} else {
+			
 			$existing_options = get_option( 'gyn_options' );
+			
 			if ( $existing_options['gyn_version'] < 1.0 ) {
+				
 				$existing_options['gyn_version'] = "1.0";
+				
 				update_option( 'gyn_options', $existing_options );
+				
 			}
 		}
 	}
@@ -163,6 +171,7 @@
 	function gyn_admin_init() {
 		add_action( 'admin_post_save_gyn_options', 'process_gyn_options' );
 	}
+	
 	add_action( 'admin_init', 'gyn_admin_init' );
 	
 	/**
@@ -179,20 +188,31 @@
 	/**
 	 * init vars
 	*/
-		function gyn_init_variables() {
-		
+	
+	function gyn_init_variables() {
+		// not used for the moment
 	}
+	
 	add_action( 'init', 'gyn_init_variables' );
-		
+	
+	/**
+	 * Language setup for the plugin
+	**/
+
+	function gyn_language_setup() {
+    	load_plugin_textdomain('gyn', false, dirname(plugin_basename(__FILE__)) . '/language/');
+	}
+	
+	add_action('init', 'gyn_language_setup');
+	
 	/**
 	 * Page content submitted to posts or pages by the shortcode [gyn/]
 	*/
-	function display_gyn() {		
-		if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) ) {
-			// send an emai to subscriber and administrator
-			if ( !isset( $gyn_mail_check ) ) {
-				$gyn_mail_check = gyn_mailer($_POST['gyn_form_value'][0],$_POST['gyn_form_value'][1],$_POST['gyn_form_value'][2],'Get your number admin','Test event');
-			}
+	function display_gyn() {
+		
+		$gyn_form_checked = handle_form_submit();
+				
+		if ( isset($gyn_form_checked) ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">This is your number</h3>
@@ -214,7 +234,7 @@
 						</tr>
 						<tr>
 							<th></th>
-							<td>' . $gyn_mail_check . '</td>
+							<td class="text-success">' . $gyn_form_checked . '</td>
 						</tr>
 					</tbody>
 				</table>
@@ -222,40 +242,40 @@
 			</div>';
 		} else {
 			$html = '<script>
-					  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );
-					</script>
-					<div class="row-fluid">
-					<div class="header">
-						<h3 class="text-success">Get your number</h3>
-					</div>
-					<div class="span12">
-					<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
-					<table class="table table-bordered">
-						<tbody>
-							<tr>
-								<th><label for="name">Name <i class="icon-asterisk"></label></th>
-								<td><input id="name" type="text" name="gyn_form_value[]" class="span12" required /></i></td>
-							</tr>
-							<tr>
-								<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
-								<td><input id="email" type="email" name="gyn_form_value[]" class="span12" required /></td>
-							</tr> 
-							<tr>
-								<th><label for="number">Retrieve your number</label></th>
-								<td><button type="submit" class="btn btn-inverse btn-block">Send me my number <i class="icon-gift icon-white"></i> </button>
-								<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
-								<input type="hidden" name="gyn_form_value[]" value="' . gyn_generate_unique_number() . '" /></td>
+				  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );
+				</script>
+				<div class="row-fluid">
+				<div class="header">
+					<h3 class="text-success">Get your number</h3>
+				</div>
+				<div class="span12">
+				<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<th><label for="name">Name <i class="icon-asterisk"></label></th>
+							<td><input id="name" type="text" name="gyn_form_value[]" class="span12" required /></i></td>
+						</tr>
+						<tr>
+							<th><label for="email">Email <i class="icon-asterisk"></i></label></th>
+							<td><input id="email" type="email" name="gyn_form_value[]" class="span12" required /></td>
+						</tr> 
+						<tr>
+							<th><label for="number">Retrieve your number</label></th>
+							<td><button type="submit" class="btn btn-inverse btn-block">Send me my number <i class="icon-gift icon-white"></i> </button>
+							<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
+							<input type="hidden" name="gyn_form_value[]" value="' . gyn_generate_unique_number() . '" /></td>
 
-							</tr>
-							<tr>
-								<th></th>
-								<td><i class="icon-asterisk"></i> In order to get your number you must share your name and email.</td>
-							</tr>
-						</tbody>
-					</table>
-					</form>
-					</div>
-				</div>';
+						</tr>
+						<tr>
+							<th></th>
+							<td><i class="icon-asterisk"></i> In order to get your number you must share your name and email.</td>
+						</tr>
+					</tbody>
+				</table>
+				</form>
+				</div>
+			</div>';
 		}
 		echo $html;
 	}

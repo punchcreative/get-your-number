@@ -6,6 +6,7 @@
 /**
  * function for generating the numbers
 */
+
 function gyn_generate_unique_number() {
 	$gyn_options = get_option( 'gyn_options' );
 	// generate a number inbetween the numbers set on activation of the plugin
@@ -16,6 +17,7 @@ function gyn_generate_unique_number() {
 /**
  * function called after users entry is submitted looking in dbase if the user doesn't exist already
 */
+
 function gyn_check_email($email_to_check) {
 	// in future release check if the email is not already used
 	// for now return 1
@@ -23,26 +25,50 @@ function gyn_check_email($email_to_check) {
 	
 }
 
+function handle_form_submit() {
+	if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && !isset( $gyn_mail_check )) {
+		
+		// send an emai to subscriber and administrator
+		$gyn_mail_check = gyn_mailer($_POST['gyn_form_value'][0],$_POST['gyn_form_value'][1],$_POST['gyn_form_value'][2],'Get your number admin','Test event');
+
+		return $gyn_mail_check;
+		
+	} else {
+		
+		return null;
+		
+	}
+}
+
 /**
  * function called after users entry is checked and ready to go
 */
+
 function gyn_mailer($name,$email,$number,$from_name,$eventname) {
+	
 	$gyn_options = get_option( 'gyn_options' );
+	
 	// send mail to the subscriber
 	$headers[] = 'From: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
 	$headers[] = 'Cc: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
 	$to = $name . '<' . $email .'>';
 	$subject = 'Your subscription number is ' . $number;
+	
 	$message = "Dear " . $name . ",\n\n" . $number . " is your subscription number for the event " . $eventname . ".\n\nYou will soon be informed if you have a lucky number.\nRegistration:\nName: " . $name . "\nEmail: " . $email . "\nNumber: " . $number . "\n\nThank you for subscribing.";
 	
 	// send the mail and set $gyn_mail with a boolean to test sending went well
 	$gyn_mail = wp_mail( $to, $subject, $message, $headers );
 	
 	if ( $gyn_mail ) {
+		
 		$gyn_mail_message = 'An email has been sent to you to confirm your subscription';
+		
 	} else {
+		
 		$gyn_mail_message = 'Sending an email failed, please remember your number';
+		
 	}
+	
 	return $gyn_mail_message;
 }
 
@@ -50,18 +76,25 @@ function gyn_mailer($name,$email,$number,$from_name,$eventname) {
  * function called after admin changes settings and want to save them
 */
 function process_gyn_options() {
+	
 	// Check user security level
 	if ( !current_user_can( 'manage_options' ) ) wp_die( 'No permission for you to change options' );
 	
 	// Check nonce field created in configuration form
 	check_admin_referer( 'gyn_settings' );
+	
 	// Retrieve original plugin options array
 	$options = get_option( 'gyn_options' );
+	
 	// Cycle through all text form fields and store their values in the options array
 	foreach ( $options as $key => $value ) {
+		
 		if ( isset( $_POST[$key] ) ) {
+			
 			$options[$key] = $_POST[$key]; //sanitize_text_field( $_POST[$key] );
+			
 		}
+		
 	}
 
 	//$options['gyn_event_name'] = 'test123';
