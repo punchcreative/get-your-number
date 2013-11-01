@@ -3,7 +3,7 @@
  * Plugin Name: Get your number
  * Plugin URI: https://github.com/punchcreative/get-your-number
  * Description: A random number generator for subscribing to an event with a limited number of participants. It provides the possibility of attending to a limited event for subscribers, even if they are not the fisrt with subscribing. See the plugin site (@github) for a more detailed description.
- * Version: 1.03 dev
+ * Version: 1.0
  * Author: Erik Kroon | Punch Creative
  * Author URI: http://www.punchcreative.nl
  * License: GPL2
@@ -22,15 +22,60 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+	global $gyn_options;
+	global $gyn_form_checked;
 	
-
-	/**
-	 * include all php files in subfolder /inc
+	// version number to be used in the plugin files
+	define( "VERSION", "1.0" );
+	
+	/*****************************************
+	 * include functions php file in subfolder /inc
 	*/
-	foreach ( glob( plugin_dir_path( __FILE__ )."inc/*.php" ) as $file )
-	include_once $file;
 	
-	/**
+	require plugin_dir_path( __FILE__ ). 'inc/gyn_functions.php';
+	
+	// only load admin functions is the user has admin permissions
+	if ( is_admin() ) {
+		require plugin_dir_path( __FILE__ ) . 'inc/gyn_admin_functions.php';
+	}
+	
+	/*************************************************
+	 * functions that runs at activation of the plugin
+	*/
+	function gyn_activation() {
+		if ( get_option( 'gyn_options' ) === false ) {
+			
+			$new_options['gyn_version'] = '1.0';
+			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
+			$new_options['gyn_min_nr'] = '1';
+			$new_options['gyn_max_nr'] = '100';
+			$new_options['gyn_event_name'] = 'First event';
+			$new_options['gyn_given_numbers'] = array();
+			
+			add_option( 'gyn_options', $new_options );
+			
+		} else {
+			
+			$existing_options = get_option( 'gyn_options' );
+			
+			if ( $existing_options['gyn_version'] < 1.0 ) {
+				
+				$existing_options['gyn_version'] = "1.0";
+			}
+			
+			if ( !isset( $existing_options['gyn_given_numbers'] ) || $existing_options['gyn_given_numbers'] != '' ) {
+				
+				$existing_options['gyn_given_numbers'] = array();
+			}
+				
+			update_option( 'gyn_options', $existing_options );
+		}
+	}
+	// on activation of the plugin call this function
+	register_activation_hook( __FILE__ , 'gyn_activation' );	
+	
+	
+	/*************************************
 	 * register scripts used by the plugin
 	*/			
 	function gyn_scripts() {
@@ -38,8 +83,8 @@
 		wp_enqueue_script('jquery');
 		
 		// load gyn_js scripts
-		wp_register_script( 'gyn_js', plugins_url('js/gyn_js.js', __FILE__) , array('jquery') , false, true);
-		wp_enqueue_script( 'gyn_js' );
+		// wp_register_script( 'gyn_js', plugins_url('js/gyn_js.js', __FILE__) , array('jquery') , false, true);
+		// wp_enqueue_script( 'gyn_js' );
 		
 		// load jqBootstrapValidation_js scripts
 		wp_register_script( 'bootstrap_validation_js', plugins_url('js/jqBootstrapValidation.js', __FILE__) , array('jquery') , false, true);
@@ -53,15 +98,16 @@
 		
 	add_action( 'wp_enqueue_scripts', 'gyn_scripts' );
 	
-	/**
+	/************************************
 	 * register styles used by the plugin
 	*/	
 	function gyn_styles() {
+		// if you want to use bootstrap for this plugin 
 		$style = 'bootstrap';
 		if( ( ! wp_style_is( $style, 'queue' ) ) && ( ! wp_style_is( $style, 'done' ) ) ) {
 			//queue up bootstrap_css 2.3.2 file from CDN
-			wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
-			wp_enqueue_style( 'bootstrap_css' );
+			//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
+			//wp_enqueue_style( 'bootstrap_css' );
 			
 			// load bootstrap_css 3.0.0 file from CDN
 			//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css' );
@@ -78,103 +124,7 @@
 	
 	add_action('wp_enqueue_scripts', 'gyn_styles');
 	
-	/**
-	 * functions that runs at activation of the plugin
-	*/
-	function gyn_activation() {
-		if ( get_option( 'gyn_options' ) === false ) {
-			
-			$new_options['gyn_version'] = '1.0';
-			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
-			$new_options['gyn_min_nr'] = '1';
-			$new_options['gyn_max_nr'] = '80';
-			$new_options['gyn_event_name'] = 'Try-out GYN';
-			
-			add_option( 'gyn_options', $new_options );
-			
-		} else {
-			
-			$existing_options = get_option( 'gyn_options' );
-			
-			if ( $existing_options['gyn_version'] < 1.0 ) {
-				
-				$existing_options['gyn_version'] = "1.0";
-				
-				update_option( 'gyn_options', $existing_options );
-				
-			}
-		}
-	}
-	// on activation of the plugin call this function
-	register_activation_hook( __FILE__ , 'gyn_activation' );	
-	
-	/**
-	 * Admin setting page html
-	*/
-	function gyn_config_page() {
-		// Retrieve plugin configuration options from database
-		$options = get_option( 'gyn_options' );
-		?>
-		<div id="gyn-general" class="wrap">
-            <h2><?php _e('GYN settings | GYN version', 'get-your-number') . " " . $options['gyn_version']; ?></h2>
-            <?php
-            if ( isset( $_GET['message'] ) && $_GET['message'] == '1' ) {
-				?>
-				<div id='message' class='updated fade'><p><strong><?php _e('Settings are saved', 'get-your-number'); ?></strong></p></div>
-			 <?php 
-			 }
-			 ?>
-            <form method="post" action="admin-post.php">
-                <input type="hidden" name="action" value="save_gyn_options" />
-                <table border="1" celpadding="0" celspacing="0" class="table table-bordered span12">
-                    <tr>
-                        <th scope="row"><?php _e('Admin email', 'get-your-number'); ?></th>
-                        <td><input type="text" name="gyn_admin_email" value="<?php echo $options['gyn_admin_email']; ?>"/></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><?php _e('Start number', 'get-your-number'); ?></th>
-                        <td><input type="text" name="gyn_min_nr" value="<?php echo $options['gyn_min_nr']; ?>"/></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><?php _e('End number', 'get-your-number'); ?></th>
-                        <td><input type="text" name="gyn_max_nr" value="<?php echo $options['gyn_max_nr']; ?>"/></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><?php _e('Event name', 'get-your-number'); ?></th>
-                        <td><input type="text" name="gyn_event_name" value="<?php echo $options['gyn_event_name']; ?>"/></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">&nbsp;</th>
-                        <td><input type="submit" value="<?php _e('Submit', 'get-your-number'); ?>" class="button-primary"/></td>
-                    </tr>
-                </table>
-                <!-- Adding security through hidden referrer field -->
-                <?php wp_nonce_field( 'gyn_settings' ); ?>
-            </form>
-		</div>
-	<?php
-	}
-	
-	/**
-	 * Admin setting for this plugin
-	*/
-	add_action('admin_menu', 'gyn_plugin_settings');
-
-	function gyn_plugin_settings() {
-		// add a settings menu item in the admin area
-		add_options_page( 'GYN Configuration', 'Get Your Number', 'manage_options', 'gyn-configuration', 'gyn_config_page' );
-	}
-	
-	/**
-	 * admin init function for saving settings
-	*/
-	function gyn_admin_init() {
-		add_action( 'admin_post_save_gyn_options', 'process_gyn_options' );
-	}
-	
-	add_action( 'admin_init', 'gyn_admin_init' );
-	
-	/**
+	/****************************************************
 	 * functions that runs at de-activation of the plugin
 	*/
 	
@@ -185,17 +135,18 @@
 	// on de-activation of the plugin call this function
 	register_deactivation_hook( __FILE__ , 'gyn_deactivation' );
 
-	/**
+	/***********
 	 * init vars
 	*/
 	
 	function gyn_init_variables() {
-		// not used for the moment
+		// get the settings foor the plugin
+		$gyn_options = get_option( 'gyn_options' );
 	}
 	
 	add_action( 'init', 'gyn_init_variables' );
 	
-	/**
+	/*******************************
 	 * Language setup for the plugin
 	**/
 
@@ -205,14 +156,21 @@
 	
 	add_action('plugins_loaded', 'gyn_language_setup');
 	
-	/**
+	/******************************************************************
 	 * Page content submitted to posts or pages by the shortcode [gyn/]
 	*/
-	function display_gyn() {
+	function display_gyn() {		
+		global $gyn_form_checked;
 		
-		$gyn_form_checked = handle_form_submit();
+		if ( isset($_POST['gyn_form_nonce']) && wp_verify_nonce( $_POST['gyn_form_nonce'], 'gyn_number_request_form' ) && !empty( $_POST['gyn_form_value'][0] ) && !empty( $_POST['gyn_form_value'][1] ) && !isset( $gyn_form_checked ) ) {
+			if ( $_POST['gyn_form_value'][2] != '0' ) {
+				$gyn_form_checked = handle_form_submit();
+			} else {
+				$gyn_form_checked = __('All numbers are taken, sorry!', 'get_your_number');
+			}
+		} 
 				
-		if ( isset($gyn_form_checked) ) {
+		if ( isset( $gyn_form_checked ) ) {
 			$html = '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">' . __('This is your number', 'get-your-number') . '</h3>
@@ -250,19 +208,21 @@
 				</div>
 				<div class="span12">
 				<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
+				<!-- Nonce fields to verify visitor provenance -->
+				' .  wp_nonce_field( "gyn_number_request_form", "gyn_form_nonce" ) . '
 				<table class="table table-bordered">
 					<tbody>
 						<tr>
 							<th><label for="name">' . __('Name', 'get-your-number') . ' <i class="icon-asterisk"></label></th>
-							<td><input id="name" type="text" name="gyn_form_value[]" class="span12" required /></i></td>
+							<td><input id="name" type="text" name="gyn_form_value[]" class="formfield" required /></i></td>
 						</tr>
 						<tr>
 							<th><label for="email">' . __('Email', 'get-your-number') . ' <i class="icon-asterisk"></i></label></th>
-							<td><input id="email" type="email" name="gyn_form_value[]" class="span12" required /></td>
+							<td><input id="email" type="email" name="gyn_form_value[]" class="formfield" required /></td>
 						</tr> 
 						<tr>
-							<th><label for="number">' . __('Retreive your number', 'get-your-number') . '</label></th>
-							<td><button type="submit" class="btn btn-inverse btn-block">' . __('Send me my number', 'get-your-number') . ' <i class="icon-gift icon-white"></i> </button>
+							<th><!-- <label for="number">' . __('Retreive your number', 'get-your-number') . '</label> --></th>
+							<td><button type="submit" class="btn">' . __('Send me my number', 'get-your-number') . ' <i class="icon-gift icon-white"></i> </button>
 							<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
 							<input type="hidden" name="gyn_form_value[]" value="' . gyn_generate_unique_number() . '" /></td>
 
@@ -281,4 +241,5 @@
 	}
 	// define the shortcode for the plugin
 	add_shortcode("gyn", "display_gyn");
+	
 ?>
