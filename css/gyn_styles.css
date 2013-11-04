@@ -3,3 +3,8 @@
 .formfield {
 	width: 100%;
 }
+
+table.gyn-reg-users-table {
+	border: #656565 thin solid;
+	margin: 30px 10px;
+}

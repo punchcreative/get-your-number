@@ -7,33 +7,41 @@
  * function for generating the numbers
 */
 
-function gyn_generate_unique_number() {
-	$gyn_options = get_option( 'gyn_options' );
-	// generate a number inbetween the numbers set on activation of the plugin
-	$number = mt_rand($gyn_options['gyn_min_nr'],$gyn_options['gyn_max_nr']);
-	check_this_number( $number );
+function gyn_generate_unique_number( $reg_name, $reg_email) {
+	$options = get_option( 'gyn_options' );
+	// fetch the array with available numbers
+	$arr = $options['gyn_given_numbers'];
+	// check if there are still numbers available
+	$gyn_max_numbers_to_give = $options['gyn_max_nr'] - ( $options['gyn_min_nr'] - 1 );
+	
+	if ( isset( $arr ) && count( $arr ) < $gyn_max_numbers_to_give ) {
+		
+		// generate a number inbetween the numbers set on activation of the plugin
+		$nr = mt_rand( $options['gyn_min_nr'], $options['gyn_max_nr'] );	
+		
+		if ( !in_array( $nr, $arr ) ) {
+			array_push( $arr, array( $reg_name, $nr , $reg_email ) );
+			$options[ 'gyn_given_numbers' ] = $arr;
+			// save the new values in the options table;
+			update_option( 'gyn_options', $options );
+			
+		} else {
+			
+			gyn_generate_unique_number();
+			
+		}
+		
+	} else {
+		
+		// no numbers available anymore
+		$nr = '0';
+		
+	}
+	
+	return $nr;
 }
 
-function check_this_number ( $nr ) {
-	$gyn_options = get_option( 'gyn_options' );
-	$existing = $gyn_options['gyn_given_numbers'];
-	$test = array_search($nr, $existing);
-	if ( false == $test ) {
-		if ( isset( $count_checks ) ) {
-			unset( $count_checks );
-		}
-		return $nr;
-	} else {
-		if ( !isset( $count_checks ) ) {
-			$count_checks = 0;
-		} 
-		if ( $count_checks >= (($gyn_options['gyn_max_nr'] - $gyn_options['gyn_min_nr']) + 1) ) {
-			gyn_generate_unique_number();
-		} else {
-			return '0';
-		}
-	}
-}
+
 /**
  * function called after users entry is submitted looking in dbase if the user doesn't exist already
 */
@@ -45,11 +53,11 @@ function gyn_check_email($email_to_check) {
 	
 }
 // function that sends an email to the user
-function handle_form_submit() {
+function handle_form_submit( $nr) {
 	if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && !isset( $gyn_mail_check )) {
 		
 		// send an emai to subscriber and administrator
-		$gyn_mail_check = gyn_mailer($_POST['gyn_form_value'][0],$_POST['gyn_form_value'][1],$_POST['gyn_form_value'][2],'Get your number admin','Test event');
+		$gyn_mail_check = gyn_mailer( $_POST['gyn_form_value'][0], $_POST['gyn_form_value'][1], $nr, __('Get your number admin', 'get-your-number'), $_POST['gyn_event'] );
 
 		return $gyn_mail_check;
 		
@@ -96,7 +104,6 @@ function gyn_mailer($name,$email,$number,$from_name,$eventname) {
  * function called after admin changes settings and want to save them
 */
 function process_gyn_options() {
-	global $gyn_options;
 	// Check user security level
 	if ( !current_user_can( 'manage_options' ) ) wp_die( _e('No permission for you to change options', 'get-your-number') );
 	
@@ -104,7 +111,7 @@ function process_gyn_options() {
 	check_admin_referer( 'gyn_settings' );
 	
 	// Retrieve original plugin options array
-	//$options = get_option( 'gyn_options' );
+	$options = get_option( 'gyn_options' );
 	
 	// Cycle through all text form fields and store their values in the options array
 	foreach ( $options as $key => $value ) {
@@ -117,7 +124,10 @@ function process_gyn_options() {
 		
 	}
 
-	//$options['gyn_event_name'] = 'test123';
+	// set the array for given numbers to new min and max values
+	$options['gyn_given_numbers'] = array();
+	
+	// save the new values in the options table;
 	update_option( 'gyn_options', $options );
 	
 	// Store updated options array to databaseupdate_option( 'gyn_options', $options );

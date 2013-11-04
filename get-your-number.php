@@ -27,6 +27,8 @@
 	
 	// version number to be used in the plugin files
 	define( "VERSION", "1.0" );
+	// developpers setting for quick an dirty removing options on deactivate
+	define( "GYNBUG", true);
 	
 	/*****************************************
 	 * include functions php file in subfolder /inc
@@ -49,7 +51,7 @@
 			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
 			$new_options['gyn_min_nr'] = '1';
 			$new_options['gyn_max_nr'] = '100';
-			$new_options['gyn_event_name'] = 'First event';
+			$new_options['gyn_event_name'] = 'Spinning 2014';
 			$new_options['gyn_given_numbers'] = array();
 			
 			add_option( 'gyn_options', $new_options );
@@ -61,11 +63,6 @@
 			if ( $existing_options['gyn_version'] < 1.0 ) {
 				
 				$existing_options['gyn_version'] = "1.0";
-			}
-			
-			if ( !isset( $existing_options['gyn_given_numbers'] ) || $existing_options['gyn_given_numbers'] != '' ) {
-				
-				$existing_options['gyn_given_numbers'] = array();
 			}
 				
 			update_option( 'gyn_options', $existing_options );
@@ -130,6 +127,11 @@
 	
 	function gyn_deactivation() {
 		// run uninstall script when the plugin is deleted by an admin
+		if ( GYNBUG ) {
+			if ( get_option( 'gyn_options' ) != false ) {
+				delete_option( 'gyn_options' );
+			}
+		}
 		
 	}
 	// on de-activation of the plugin call this function
@@ -161,12 +163,22 @@
 	*/
 	function display_gyn() {		
 		global $gyn_form_checked;
+		$gyn_options = get_option( 'gyn_options' );
 		
 		if ( isset($_POST['gyn_form_nonce']) && wp_verify_nonce( $_POST['gyn_form_nonce'], 'gyn_number_request_form' ) && !empty( $_POST['gyn_form_value'][0] ) && !empty( $_POST['gyn_form_value'][1] ) && !isset( $gyn_form_checked ) ) {
-			if ( $_POST['gyn_form_value'][2] != '0' ) {
-				$gyn_form_checked = handle_form_submit();
+			if ( !in_array( $_POST['gyn_form_value'][1], $gyn_options['gyn_given_numbers'] ) ) {
+				$nr = gyn_generate_unique_number( $_POST['gyn_form_value'][0], $_POST['gyn_form_value'][1] );
+				if ( $nr != '0' ) {
+					$gyn_the_nr = $nr;
+					$gyn_form_checked = handle_form_submit( $nr );
+				} else {
+					$gyn_the_nr = '--';
+					$gyn_form_checked = __('All numbers are taken, sorry!', 'get_your_number');
+				}
 			} else {
-				$gyn_form_checked = __('All numbers are taken, sorry!', 'get_your_number');
+				$key = array_search( $_POST['gyn_form_value'][1], $gyn_options['gyn_given_numbers'] );
+				$gyn_the_nr = $gyn_options['gyn_given_numbers'][$key][1];
+				$gyn_form_checked = __('You already got your number.', 'get_your_number');
 			}
 		} 
 				
@@ -188,7 +200,7 @@
 						</tr>
 						<tr>
 							<th><label for="number">' . __('Your number', 'get-your-number') . '</label></th>
-							<td>' . $_POST['gyn_form_value'][2] . '</td>
+							<td>' . $gyn_the_nr . '</td>
 						</tr>
 						<tr>
 							<th></th>
@@ -222,9 +234,11 @@
 						</tr> 
 						<tr>
 							<th><!-- <label for="number">' . __('Retreive your number', 'get-your-number') . '</label> --></th>
-							<td><button type="submit" class="btn">' . __('Send me my number', 'get-your-number') . ' <i class="icon-gift icon-white"></i> </button>
-							<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" /></td>
-							<input type="hidden" name="gyn_form_value[]" value="' . gyn_generate_unique_number() . '" /></td>
+							<td>
+								<button type="submit" class="btn">' . __('Send me my number', 'get-your-number') . ' <i class="icon-gift icon-white"></i> </button>
+								<input type="hidden" name="gyn_event" value="' . $gyn_options['gyn_event_name'] . '" />
+								<input type="hidden" name="nonce_field" value="' . wp_create_nonce( 'form_check' ) . '" />
+							</td>
 
 						</tr>
 						<tr>

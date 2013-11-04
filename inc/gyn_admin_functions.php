@@ -41,6 +41,7 @@
 	*/
 	function gyn_config_page() { 
 		global $gyn_options;
+		$gyn_options = get_option( 'gyn_options' );
 		?>
        <div id="gyn-general" class="wrap">
        
@@ -52,10 +53,28 @@
                 
 				<?php do_settings_sections( 'gyn_settings_section' ); ?>
                 
-				<input type="submit" value="Submit" class="button-primary" />
+				<input type="submit" value="<?php _e('Save settings', 'get-your-number'); ?>" class="button-primary" />
                 
            </form>
-           
+           <table class="table gyn-reg-users-table" id="reg_users" width="80%">
+			   <?php
+                echo '<tr>'; 
+                echo '<td width="10%"><strong>' . __('Name','get_your_number') . '</strong></td>';
+                echo '<td width="30%"><strong>' . __('Number','get_your_number') . '</strong></td>';
+                echo '<td width="30%"><strong>' . __('Email','get_your_number') . '</strong></td>';
+                echo '<tr>';
+                
+                if ( count( $gyn_options['gyn_given_numbers'] ) > 0 ) {
+                   foreach ( $gyn_options['gyn_given_numbers'] as $gyn_reg_users ){
+                        echo '<tr>'; 
+                        echo '<td>' . $gyn_reg_users[0] . '</td>';
+                        echo '<td>' . $gyn_reg_users[1] . '</td>';
+                        echo '<td>' . $gyn_reg_users[2] . '</td>';
+                        echo '<tr>';
+                    }
+                }
+               ?>
+			</table>
        </div>
 		<?php
 	}
