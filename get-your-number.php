@@ -3,7 +3,7 @@
  * Plugin Name: Get your number
  * Plugin URI: https://github.com/punchcreative/get-your-number
  * Description: A random number generator for subscribing to an event with a limited number of participants. It provides the possibility of attending to a limited event for subscribers, even if they are not the fisrt with subscribing. See the plugin site (@github) for a more detailed description.
- * Version: 1.0
+ * Version: 1.1
  * Author: Erik Kroon | Punch Creative
  * Author URI: http://www.punchcreative.nl
  * License: GPL2
@@ -24,6 +24,7 @@
 */
 	global $gyn_options;
 	global $gyn_form_checked;
+	global $gyn_the_nr;
 	
 	// version number to be used in the plugin files
 	define( "VERSION", "1.0" );
@@ -148,6 +149,49 @@
 	
 	add_action( 'init', 'gyn_init_variables' );
 	
+	/***********************
+	 * check for $_POST vars
+	*/
+	
+	function gyn_post_variables() {
+		global $gyn_form_checked;
+		global $gyn_the_nr;
+		
+		if ( isset($_POST['gyn_form_nonce']) && wp_verify_nonce( $_POST['gyn_form_nonce'], 'gyn_number_request_form' ) ) {
+			// check if name and email aren't empty
+			if ( !empty( $_POST['gyn_form_value'][0] ) && !empty( $_POST['gyn_form_value'][1] ) ) {
+				// load settings
+				$gyn_options = get_option( 'gyn_options' );
+				// check if the email adres is already saved in the options for gyn
+				// used the extended in_array function to search in multidimensional arrays
+				if ( !in_array_r( $_POST['gyn_form_value'][1], $gyn_options['gyn_given_numbers'] ) ) {
+					// generate a unique number sending the name and email to store it in an array
+					$nr = gyn_generate_unique_number( $_POST['gyn_form_value'][0], $_POST['gyn_form_value'][1] );
+					// check the returned number
+					if ( $nr != '0' ) {
+						$gyn_the_nr = $nr;
+						// send an email to the subscriber and set the variable $gyn_form_checked with a message about email sent
+						$gyn_form_checked = handle_form_submit( $nr );
+					} else {
+						// seems like the returned nr is 0, so the maximum amount of users is reached
+						$gyn_the_nr = '--';
+						$gyn_form_checked = __( 'All numbers are taken, sorry!' , 'get-your-number');
+					}
+				} else {
+					// an entry with the subscribers email already exists, let's find it
+					$key = recursive_array_search( $_POST['gyn_form_value'][1], $gyn_options['gyn_given_numbers'] );
+					// and display it
+					$gyn_the_nr = $key;
+					$gyn_form_checked = __( 'It seems you already got a number.' , 'get-your-number' );
+				}
+			} else {
+				unset( $gyn_form_checked );
+			}
+		} 
+	}
+	
+	add_action( 'init', 'gyn_post_variables' );
+	
 	/*******************************
 	 * Language setup for the plugin
 	**/
@@ -163,44 +207,30 @@
 	*/
 	function display_gyn() {		
 		global $gyn_form_checked;
-		$gyn_options = get_option( 'gyn_options' );
+		global $gyn_the_nr;
 		
-		if ( isset($_POST['gyn_form_nonce']) && wp_verify_nonce( $_POST['gyn_form_nonce'], 'gyn_number_request_form' ) && !empty( $_POST['gyn_form_value'][0] ) && !empty( $_POST['gyn_form_value'][1] ) && !isset( $gyn_form_checked ) ) {
-			if ( !in_array( $_POST['gyn_form_value'][1], $gyn_options['gyn_given_numbers'] ) ) {
-				$nr = gyn_generate_unique_number( $_POST['gyn_form_value'][0], $_POST['gyn_form_value'][1] );
-				if ( $nr != '0' ) {
-					$gyn_the_nr = $nr;
-					$gyn_form_checked = handle_form_submit( $nr );
-				} else {
-					$gyn_the_nr = '--';
-					$gyn_form_checked = __('All numbers are taken, sorry!', 'get_your_number');
-				}
-			} else {
-				$key = array_search( $_POST['gyn_form_value'][1], $gyn_options['gyn_given_numbers'] );
-				$gyn_the_nr = $gyn_options['gyn_given_numbers'][$key][1];
-				$gyn_form_checked = __('You already got your number.', 'get_your_number');
-			}
-		} 
+		$gyn_options = get_option( 'gyn_options' );
 				
 		if ( isset( $gyn_form_checked ) ) {
+			$key = recursive_array_search( $_POST['gyn_form_value'][1], $gyn_options['gyn_given_numbers'] );
 			$html = '<div class="row-fluid">
 				<div class="header">
-					<h3 class="text-success">' . __('This is your number', 'get-your-number') . '</h3>
+					<h3 class="text-success">' . __( 'This is your number' , 'get-your-number' ) . '</h3>
 				</div>
 				<div class="span12">
 				<table class="table table-bordered">
 					<tbody>
 						<tr>
 							<th><label for="name">' . __('Name', 'get-your-number') . '</label></th>
-							<td>' . $_POST['gyn_form_value'][0] . '</td>
+							<td>' . $gyn_options['gyn_given_numbers'][$key][0] .'</td>
 						</tr>
 						<tr>
 							<th><label for="email">' . __('Email', 'get-your-number') . '</i></label></th>
-							<td>' . $_POST['gyn_form_value'][1] . '</td>
+							<td>' . $gyn_options['gyn_given_numbers'][$key][2] .'</td>
 						</tr>
 						<tr>
 							<th><label for="number">' . __('Your number', 'get-your-number') . '</label></th>
-							<td>' . $gyn_the_nr . '</td>
+							<td>' . $gyn_options['gyn_given_numbers'][$key][1] . '</td>
 						</tr>
 						<tr>
 							<th></th>

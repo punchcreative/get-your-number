@@ -11,18 +11,19 @@ function gyn_generate_unique_number( $reg_name, $reg_email) {
 	$options = get_option( 'gyn_options' );
 	// fetch the array with available numbers
 	$arr = $options['gyn_given_numbers'];
-	// check if there are still numbers available
+	// set a var to the max numbers that can be given
 	$gyn_max_numbers_to_give = $options['gyn_max_nr'] - ( $options['gyn_min_nr'] - 1 );
 	
+	// check if there are still numbers available
 	if ( isset( $arr ) && count( $arr ) < $gyn_max_numbers_to_give ) {
 		
 		// generate a number inbetween the numbers set on activation of the plugin
 		$nr = mt_rand( $options['gyn_min_nr'], $options['gyn_max_nr'] );	
-		
-		if ( !in_array( $nr, $arr ) ) {
+		// look if the number is available
+		if ( !in_array_r( $nr, $arr ) ) {
 			array_push( $arr, array( $reg_name, $nr , $reg_email ) );
+			// save the new subcriber in the options table
 			$options[ 'gyn_given_numbers' ] = $arr;
-			// save the new values in the options table;
 			update_option( 'gyn_options', $options );
 			
 		} else {
@@ -41,6 +42,29 @@ function gyn_generate_unique_number( $reg_name, $reg_email) {
 	return $nr;
 }
 
+/**
+ * function extending standard in_array function to work in multidimensional arrays
+*/
+
+function in_array_r($needle, $haystack, $strict = false) {
+    foreach ($haystack as $item) {
+        if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function recursive_array_search($needle,$haystack) {
+    foreach($haystack as $key=>$value) {
+        $current_key=$key;
+        if($needle===$value OR (is_array($value) && recursive_array_search($needle,$value) !== false)) {
+            return $current_key;
+        }
+    }
+    return false;
+}
 
 /**
  * function called after users entry is submitted looking in dbase if the user doesn't exist already
