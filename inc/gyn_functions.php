@@ -6,7 +6,6 @@
 /**
  * function for generating the numbers
 */
-
 function gyn_generate_unique_number( $reg_name, $reg_email) {
 	$options = get_option( 'gyn_options' );
 	// fetch the array with available numbers
@@ -26,24 +25,19 @@ function gyn_generate_unique_number( $reg_name, $reg_email) {
 			$options[ 'gyn_given_numbers' ] = $arr;
 			update_option( 'gyn_options', $options );
 			
-		} else {
-			
-			gyn_generate_unique_number();
-			
+		} else {			
+			gyn_generate_unique_number();			
 		}
 		
-	} else {
-		
+	} else {		
 		// no numbers available anymore
 		$nr = '0';
-		
-	}
-	
+	}	
 	return $nr;
 }
 
 /**
- * function extending standard in_array function to work in multidimensional arrays
+ * functions extending standard in_array function and array_search to work in multidimensional arrays
 */
 
 function in_array_r($needle, $haystack, $strict = false) {
@@ -67,16 +61,10 @@ function recursive_array_search($needle,$haystack) {
 }
 
 /**
- * function called after users entry is submitted looking in dbase if the user doesn't exist already
+ * functions called after users entry is checked and ready to go
 */
 
-function gyn_check_email($email_to_check) {
-	// in future release check if the email is not already used
-	// for now return 1
-	return 1;		
-	
-}
-// function that sends an email to the user
+// use the nonce to check that the function is called from within wordpress and the gyn form
 function handle_form_submit( $nr) {
 	if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && !isset( $gyn_mail_check )) {
 		
@@ -86,16 +74,12 @@ function handle_form_submit( $nr) {
 		return $gyn_mail_check;
 		
 	} else {
-		
-		return null;
-		
+		// somebody is messing around in Wordpress, which we don't want
+		return null;		
 	}
 }
 
-/**
- * function called after users entry is checked and ready to go
-*/
-
+// function that sends an email to the user after the nonce is checked in handle_form_submit( $nr )
 function gyn_mailer($name,$email,$number,$from_name,$eventname) {
 	
 	$gyn_options = get_option( 'gyn_options' );
@@ -123,42 +107,4 @@ function gyn_mailer($name,$email,$number,$from_name,$eventname) {
 	
 	return $gyn_mail_message;
 }
-
-/**
- * function called after admin changes settings and want to save them
-*/
-function process_gyn_options() {
-	// Check user security level
-	if ( !current_user_can( 'manage_options' ) ) wp_die( _e('No permission for you to change options', 'get-your-number') );
-	
-	// Check nonce field created in configuration form
-	check_admin_referer( 'gyn_settings' );
-	
-	// Retrieve original plugin options array
-	$options = get_option( 'gyn_options' );
-	
-	// Cycle through all text form fields and store their values in the options array
-	foreach ( $options as $key => $value ) {
-		
-		if ( isset( $_POST[$key] ) ) {
-			
-			$options[$key] = $_POST[$key]; //sanitize_text_field( $_POST[$key] );
-			
-		}
-		
-	}
-
-	// set the array for given numbers to new min and max values
-	$options['gyn_given_numbers'] = array();
-	
-	// save the new values in the options table;
-	update_option( 'gyn_options', $options );
-	
-	// Store updated options array to databaseupdate_option( 'gyn_options', $options );
-	// Redirect the page to the configuration form that was processed
-	
-	wp_redirect( add_query_arg( array( 'page' => 'gyn-configuration', 'message' => '1' ), admin_url( 'options-general.php' ) ) );
-	exit;
-}
-
 ?>

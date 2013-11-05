@@ -1,10 +1,18 @@
-/* CSS Document */
+/* CSS Document 
+ * GYN Wordpress plugin
+*/
 
 .formfield {
 	width: 100%;
 }
 
-table.gyn-reg-users-table {
-	border: #656565 thin solid;
-	margin: 30px 10px;
+.gyn-reg-users-table,
+.gyn-admin-warning-table,
+.admin-settings-box {
+	margin: 30px 0;
+}
+
+.gyn-admin-warning-table th.warning {
+	color: #FFFFFF;
+	background-color: #FF0004;
 }

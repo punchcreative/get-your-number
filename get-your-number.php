@@ -27,9 +27,9 @@
 	global $gyn_the_nr;
 	
 	// version number to be used in the plugin files
-	define( "VERSION", "1.0" );
+	define( 'VERSION', '1.1' );
 	// developpers setting for quick an dirty removing options on deactivate
-	define( "GYNBUG", true);
+	define( 'GYNBUG', true);
 	
 	/*****************************************
 	 * include functions php file in subfolder /inc
@@ -48,11 +48,11 @@
 	function gyn_activation() {
 		if ( get_option( 'gyn_options' ) === false ) {
 			
-			$new_options['gyn_version'] = '1.0';
+			$new_options['gyn_version'] = VERSION;
 			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
 			$new_options['gyn_min_nr'] = '1';
 			$new_options['gyn_max_nr'] = '100';
-			$new_options['gyn_event_name'] = 'Spinning 2014';
+			$new_options['gyn_event_name'] = __( 'Event name' , 'get-your-number');;
 			$new_options['gyn_given_numbers'] = array();
 			
 			add_option( 'gyn_options', $new_options );
@@ -61,15 +61,15 @@
 			
 			$existing_options = get_option( 'gyn_options' );
 			
-			if ( $existing_options['gyn_version'] < 1.0 ) {
+			if ( $existing_options['gyn_version'] < VERSION ) {
 				
-				$existing_options['gyn_version'] = "1.0";
+				$existing_options['gyn_version'] = VERSION;
 			}
 				
 			update_option( 'gyn_options', $existing_options );
 		}
 	}
-	// on activation of the plugin call this function
+	
 	register_activation_hook( __FILE__ , 'gyn_activation' );	
 	
 	
@@ -100,18 +100,22 @@
 	 * register styles used by the plugin
 	*/	
 	function gyn_styles() {
-		// if you want to use bootstrap for this plugin 
-		$style = 'bootstrap';
-		if( ( ! wp_style_is( $style, 'queue' ) ) && ( ! wp_style_is( $style, 'done' ) ) ) {
+		// if you want to use bootstrap for this plugin remove slashes in front of the version you prefer
+		// you will have to add/modify the desired classes in the shortcode tables
+		/*
+		if( ( ! wp_style_is( 'bootstrap', 'queue' ) ) && ( ! wp_style_is( 'bootstrap', 'done' ) ) ) {
 			//queue up bootstrap_css 2.3.2 file from CDN
-			//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
-			//wp_enqueue_style( 'bootstrap_css' );
+			wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
+			wp_enqueue_style( 'bootstrap_css' );
 			
 			// load bootstrap_css 3.0.0 file from CDN
 			//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css' );
 			//wp_enqueue_style( 'bootstrap_css' );
 		}
-				
+		*/
+		
+		// fontawesome is used in the shortcode tables for displaying asterisk
+		// you can disable this if you prefer		
 		wp_register_style( 'fontawesome_css' , '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css' );
 		wp_enqueue_style( 'fontawesome_css' );
 
@@ -125,9 +129,8 @@
 	/****************************************************
 	 * functions that runs at de-activation of the plugin
 	*/
-	
 	function gyn_deactivation() {
-		// run uninstall script when the plugin is deleted by an admin
+		// for debugging purposes by developer: runs uninstall script when the plugin is deactivated by an admin
 		if ( GYNBUG ) {
 			if ( get_option( 'gyn_options' ) != false ) {
 				delete_option( 'gyn_options' );
@@ -135,13 +138,12 @@
 		}
 		
 	}
-	// on de-activation of the plugin call this function
+	
 	register_deactivation_hook( __FILE__ , 'gyn_deactivation' );
 
 	/***********
 	 * init vars
 	*/
-	
 	function gyn_init_variables() {
 		// get the settings foor the plugin
 		$gyn_options = get_option( 'gyn_options' );
@@ -150,9 +152,8 @@
 	add_action( 'init', 'gyn_init_variables' );
 	
 	/***********************
-	 * check for $_POST vars
+	 * check for $_POST vars after form submission
 	*/
-	
 	function gyn_post_variables() {
 		global $gyn_form_checked;
 		global $gyn_the_nr;
@@ -194,9 +195,12 @@
 	
 	/*******************************
 	 * Language setup for the plugin
+	 * use POEDIT and first load default.po from the root of the directory
+	 * make changes in there and save as in the languages folder
+	 * be sure to put get-your-number in front of the language definition
 	**/
-
 	function gyn_language_setup() {
+		// set location of the language files for the plugin
     	load_plugin_textdomain('get-your-number', false, dirname(plugin_basename(__FILE__)) . '/language/');
 	}
 	
@@ -283,7 +287,6 @@
 		}
 		echo $html;
 	}
-	// define the shortcode for the plugin
-	add_shortcode("gyn", "display_gyn");
 	
+	add_shortcode("gyn", "display_gyn");
 ?>

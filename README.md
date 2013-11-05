@@ -11,6 +11,8 @@ You want to enable subscription to a spinning event with a maximum of 35 partici
 <li>after registration, mail the subscriber, and the GYN administrator, the random and unique number that has been given</li>
 </ul>
 
+If a person has subscribed the name, number and email is logged in the options table. If an email is found in the options table, it's not possible to request another number.
+
 After you close the subscription, you can decide on how to make use of the numbers that are given.
 
 Playing a Bingo could be one ;-)
