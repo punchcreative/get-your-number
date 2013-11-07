@@ -29,7 +29,8 @@
 	// version number to be used in the plugin files
 	define( 'VERSION', '1.1' );
 	// developpers setting for quick an dirty removing options on deactivate
-	define( 'GYNBUG', true);
+	// leave this as it is when using the plugin on your site
+	// define( 'GYNBUG', true);
 	
 	/*****************************************
 	 * include functions php file in subfolder /inc
