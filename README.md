@@ -15,4 +15,6 @@ If a person has subscribed the name, number and email is logged in the Wordpress
 
 After you close the subscription, you can decide on how to make use of the numbers that are given.
 
+Install the plugin in a folder named <strong>get-your-number</strong> in your Wordpress plugins directory
+
 Playing a Bingo could be one ;-)
