@@ -164,7 +164,7 @@ function gyn_plugin_meta_box( $gyn_options ) {
        		<td class="alert"><strong><?php _e('WARNING! Changing the settings will also clear the saved registrations!', 'get-your-number'); ?></strong></td>
        <tr>
     </table>
-	<input type="submit" value="Submit" class="button-primary"/>
+	<input type="submit" value="<?php _e( 'Save changes', 'get-your-number'); ?>" class="button-primary"/>
 	<?php
 }
 

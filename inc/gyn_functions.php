@@ -6,7 +6,10 @@
 /**
  * function for generating the numbers
 */
-function gyn_generate_unique_number( $reg_name, $reg_email) {
+function gyn_generate_unique_number( $name, $email) {
+	$gyn_username = $name;
+	$gyn_usermail = $email;
+		
 	$options = get_option( 'gyn_options' );
 	// fetch the array with available numbers
 	$arr = $options['gyn_given_numbers'];
@@ -20,13 +23,14 @@ function gyn_generate_unique_number( $reg_name, $reg_email) {
 		$nr = mt_rand( $options['gyn_min_nr'], $options['gyn_max_nr'] );	
 		// look if the number is available
 		if ( !in_array_r( $nr, $arr ) ) {
-			array_push( $arr, array( $reg_name, $nr , $reg_email ) );
+			array_push( $arr, array( $gyn_username, $nr , $gyn_usermail ) );
 			// save the new subcriber in the options table
 			$options[ 'gyn_given_numbers' ] = $arr;
 			update_option( 'gyn_options', $options );
 			
-		} else {			
-			gyn_generate_unique_number();			
+		} else {	
+			$nr = NULL;
+			gyn_generate_unique_number( $gyn_username, $gyn_usermail );			
 		}
 		
 	} else {		
@@ -40,7 +44,7 @@ function gyn_generate_unique_number( $reg_name, $reg_email) {
  * functions extending standard in_array function and array_search to work in multidimensional arrays
 */
 
-function in_array_r($needle, $haystack, $strict = false) {
+function in_array_r($needle, $haystack, $strict = true) {
     foreach ($haystack as $item) {
         if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
             return true;
@@ -50,10 +54,10 @@ function in_array_r($needle, $haystack, $strict = false) {
     return false;
 }
 
-function recursive_array_search($needle,$haystack) {
+function recursive_array_search($needle,$haystack, $strict = true) {
     foreach($haystack as $key=>$value) {
         $current_key=$key;
-        if($needle===$value OR (is_array($value) && recursive_array_search($needle,$value) !== false)) {
+        if($needle===$value OR (is_array($value) && recursive_array_search($needle,$value, $strict) !== false)) {
             return $current_key;
         }
     }
@@ -65,11 +69,16 @@ function recursive_array_search($needle,$haystack) {
 */
 
 // use the nonce to check that the function is called from within wordpress and the gyn form
-function handle_form_submit( $nr) {
-	if ( isset($_POST['nonce_field']) && wp_verify_nonce( $_POST['nonce_field'], 'form_check' ) && !isset( $gyn_mail_check )) {
-		
+function handle_form_submit( $nr, $name, $email, $event ) {
+	global $gyn_mail_check;
+	
+	$gyn_username = $name;
+	$gyn_usermail = $email;
+	$gyn_event = $event;
+	
+	if ( !isset( $gyn_mail_check ) && isset($_POST['gyn_form_nonce']) && wp_verify_nonce( $_POST['gyn_form_nonce'], 'gyn_number_request_form' ) ) {
 		// send an emai to subscriber and administrator
-		$gyn_mail_check = gyn_mailer( $_POST['gyn_form_value'][0], $_POST['gyn_form_value'][1], $nr, __('Get your number admin', 'get-your-number'), $_POST['gyn_event'] );
+		$gyn_mail_check = gyn_mailer( $gyn_username, $gyn_usermail, $nr, __('Get your number admin', 'get-your-number'), $gyn_event );
 
 		return $gyn_mail_check;
 		
@@ -80,31 +89,33 @@ function handle_form_submit( $nr) {
 }
 
 // function that sends an email to the user after the nonce is checked in handle_form_submit( $nr )
-function gyn_mailer($name,$email,$number,$from_name,$eventname) {
+function gyn_mailer( $name, $email, $number, $from_name, $eventname ) {
 	
 	$gyn_options = get_option( 'gyn_options' );
 	
-	// send mail to the subscriber
-	$headers[] = 'From: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
-	$headers[] = 'Cc: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
-	$to = $name . '<' . $email .'>';
-	$subject = __('Your subscription number is ', 'get-your-number') . " " . $number;
+	if ( isset($_POST['gyn_form_nonce']) && wp_verify_nonce( $_POST['gyn_form_nonce'], 'gyn_number_request_form' ) ) {
+		// send mail to the subscriber
+		$headers[] = 'From: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
+		$headers[] = 'Cc: ' .$from_name . ' <' . $gyn_options['gyn_admin_email'] . '>';
+		$to = $name . '<' . $email .'>';
+		$subject = __('Your subscription number is ', 'get-your-number') . " " . $number;
+		
+		$message = __('Dear', 'get-your-number') . " " . $name . ",\n\n" . $number . " " . __('is your subscription number for the event', 'get-your-number') . " " . $eventname . ".\n\n" . __('You will soon be informed if you have a lucky number', 'get-your-number'). "\n\n" . __('Name', 'get-your-number') . ": " . $name . "\n" . __('Email', 'get-your-number') . ": " . $email . "\n" . __('Number', 'get-your-number') . ": " . $number . "\n\n" . __('Thank you for subscribing', 'get-your-number') . ".";
+		
+		// send the mail and set $gyn_mail with a boolean to test sending went well
+		$gyn_mail = wp_mail( $to, $subject, $message, $headers );
 	
-	$message = __('Dear', 'get-your-number') . " " . $name . ",\n\n" . $number . " " . __('is your subscription number for the event', 'get-your-number') . " " . $eventname . ".\n\n" . __('You will soon be informed if you have a lucky number', 'get-your-number'). "\n\n" . __('Name', 'get-your-number') . ": " . $name . "\n" . __('Email', 'get-your-number') . ": " . $email . "\n" . __('Number', 'get-your-number') . ": " . $number . "\n\n" . __('Thank you for subscribing', 'get-your-number') . ".";
-	
-	// send the mail and set $gyn_mail with a boolean to test sending went well
-	$gyn_mail = wp_mail( $to, $subject, $message, $headers );
-	
-	if ( $gyn_mail ) {
+		if ( $gyn_mail ) {
+			
+			$gyn_mail_message = __('An email has been sent to you to confirm your subscription', 'get-your-number');
+			
+		} else {
+			
+			$gyn_mail_message = __('Sending an email failed, please remember your number', 'get-your-number');
+			
+		}
 		
-		$gyn_mail_message = __('An email has been sent to you to confirm your subscription', 'get-your-number');
-		
-	} else {
-		
-		$gyn_mail_message = __('Sending an email failed, please remember your number', 'get-your-number');
-		
+		return $gyn_mail_message;
 	}
-	
-	return $gyn_mail_message;
 }
 ?>

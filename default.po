@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Get Your Number\n"
-"POT-Creation-Date: 2013-11-07 17:50+0100\n"
-"PO-Revision-Date: 2013-11-07 18:01+0100\n"
+"POT-Creation-Date: 2013-11-08 11:48+0100\n"
+"PO-Revision-Date: 2013-11-08 11:48+0100\n"
 "Last-Translator: Punch Creative <mail@punchcreative>\n"
 "Language-Team: Punch Creative <mail@punchcreative.nl>\n"
 "Language: Dutch\n"
@@ -15,51 +15,55 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: get-your-number.php:55 inc/gyn_admin_functions.php:155
+#: get-your-number.php:56 inc/gyn_admin_functions.php:155
 msgid "Event name"
 msgstr "Naam evenement"
 
-#: get-your-number.php:179
+#: get-your-number.php:180 get-your-number.php:224
 msgid "All numbers are taken, sorry!"
 msgstr "Alle nummers zijn al vergeven, sorry!"
 
-#: get-your-number.php:186
+#: get-your-number.php:187
 msgid "It seems you already got a number."
 msgstr "Je hebt eerder je nummer al ontvangen."
 
-#: get-your-number.php:222
+#: get-your-number.php:227
+msgid "Subscription is closed"
+msgstr "De inschrijving is gesloten"
+
+#: get-your-number.php:236
 msgid "This is your number"
 msgstr "Dit is je nummer"
 
-#: get-your-number.php:228 get-your-number.php:262
+#: get-your-number.php:242 get-your-number.php:276
 #: inc/gyn_admin_functions.php:178 inc/gyn_admin_functions.php:185
 #: inc/gyn_functions.php:93
 msgid "Name"
 msgstr "Naam"
 
-#: get-your-number.php:232 get-your-number.php:266
+#: get-your-number.php:246 get-your-number.php:280
 #: inc/gyn_admin_functions.php:180 inc/gyn_admin_functions.php:187
 #: inc/gyn_functions.php:93
 msgid "Email"
 msgstr "Email"
 
-#: get-your-number.php:236
+#: get-your-number.php:250
 msgid "Your number"
 msgstr "Jouw nummer"
 
-#: get-your-number.php:253
+#: get-your-number.php:267
 msgid "Get your number"
 msgstr "Vraag je nummer aan"
 
-#: get-your-number.php:270
+#: get-your-number.php:284
 msgid "Retreive your number"
 msgstr "Vraag je nummer aan"
 
-#: get-your-number.php:272
+#: get-your-number.php:286
 msgid "Send me my number"
 msgstr "Stuur me mijn nummer"
 
-#: get-your-number.php:280
+#: get-your-number.php:294
 msgid "In order to get your number you must share your name and email"
 msgstr "Om een nummer te krijgen moet je je naam en email invoeren"
 
@@ -88,6 +92,11 @@ msgid "WARNING! Changing the settings will also clear the saved registrations!"
 msgstr ""
 "WAARSCHUWING! Als je de instellingen aanpast en opslaat wis je ook de "
 "opgeslagen inschrijvingen!"
+
+#: inc/gyn_admin_functions.php:167
+#, fuzzy
+msgid "Save changes"
+msgstr "Sla instellingen op"
 
 #: inc/gyn_admin_functions.php:179 inc/gyn_admin_functions.php:186
 #: inc/gyn_functions.php:93
@@ -167,9 +176,6 @@ msgstr "Het sturen van een email is mislukt onthoud s.v.p. je nummer"
 #~ msgstr ""
 #~ "Stel hier een email adres in voor de beheerder, geef de nummer reeks aan "
 #~ "en geef de naam van het evenement op."
-
-#~ msgid "Save settings"
-#~ msgstr "Sla instellingen op"
 
 #~ msgid "Admin configuration section"
 #~ msgstr "Beheerders configuratie onderdeel"
