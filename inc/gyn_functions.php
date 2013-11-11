@@ -16,7 +16,7 @@ function gyn_generate_unique_number( $name, $email) {
 	
 	// check if there are still numbers available
 	if ( count( $arr ) >  0 ) {
-		
+		// if the array only holds 1 more number
 		if ( count( $arr ) != 1 ) {
 			$key = mt_rand( 0, count( $arr ) -1 );
 		} else {
@@ -24,12 +24,15 @@ function gyn_generate_unique_number( $name, $email) {
 		}
 		
 		$nr = $arr[$key];	
-		
+		// remove the number from the array
 		unset($arr[$key]);
-		
+		// re-index the array
+		$new_arr = array_values($arr);
+		// save the subscriber in the options variable
 		array_push( $gyn_options['gyn_given_numbers'], array( $gyn_username, $nr , $gyn_usermail ) );
-		// save the new subcriber in the options table
-		$gyn_options[ 'gyn_available_numbers' ] = $arr;
+		// save the new array in the options variable
+		$gyn_options[ 'gyn_available_numbers' ] = $new_arr;
+		// save all in the Wordpress options for the plugin
 		update_option( 'gyn_options', $gyn_options );
 			
 	} else {		
