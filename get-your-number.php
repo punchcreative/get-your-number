@@ -31,9 +31,6 @@
 	
 	// version number to be used in the plugin files
 	define( 'VERSION', '1.1' );
-	// developpers setting for quick an dirty removing options on deactivate
-	// leave this as it is when using the plugin on your site
-	define( 'GYNBUG', true);
 	
 	/*****************************************
 	 * include functions php file in subfolder /inc
@@ -44,14 +41,6 @@
 	// only load admin functions is the user has admin permissions
 	if ( is_admin() ) {
 		require plugin_dir_path( __FILE__ ) . 'inc/gyn_admin_functions.php';
-	}
-	
-	/*
-	 * Punch Creative development tools
-	 * use tj( $var ) or tj_log( $var )
-	*/
-	if ( GYNBUG ) {
-		require plugin_dir_path( __FILE__ ) . 'inc/punch_dev_functions.php';
 	}
 	
 	/*************************************************
