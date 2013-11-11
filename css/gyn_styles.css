@@ -19,3 +19,8 @@ td.form-field-label {
 .widefat td.alert {
 	color: #FF0000;
 }
+
+.widefat td.wrap-it {
+	max-width: 300px;
+	word-wrap: normal;
+}

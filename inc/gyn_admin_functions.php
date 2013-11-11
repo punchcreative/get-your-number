@@ -69,6 +69,7 @@ function process_gyn_options() {
 
 	// set the array for given numbers to new min and max values
 	$options['gyn_given_numbers'] = array();
+	$options['gyn_available_numbers'] = range( $options['gyn_min_nr'], $options['gyn_max_nr'] );
 	
 	// save the new values in the options table;
 	update_option( 'gyn_options', $options );
@@ -140,16 +141,20 @@ function gyn_plugin_meta_box( $gyn_options ) {
 	<table class="widefat gyn-reg-users-table" id="reg_users" >
 		<tbody>
 			<tr>
-			  <td class="form-field-label" ><strong><?php _e('Admin email', 'get-your-number') ?></strong></td>
+			  <td class="form-field-label" ><strong><?php _e('Admin email', 'get-your-number'); ?></strong></td>
 			  <td><input type="text" name="gyn_admin_email" value="<?php echo $gyn_options['gyn_admin_email']; ?>"/></td>              
 			</tr>
 			<tr>
-			  <td><strong><?php _e('Start number', 'get-your-number') ?></strong></td>
+			  <td><strong><?php _e('Start number', 'get-your-number'); ?></strong></td>
 			  <td><input type="text" name="gyn_min_nr" value="<?php echo $gyn_options['gyn_min_nr']; ?>"/></td>              
 			</tr>
 			<tr>
-			  <td><strong><?php _e('End number', 'get-your-number') ?></strong></td>
+			  <td><strong><?php _e('End number', 'get-your-number'); ?></strong></td>
 			  <td><input type="text" name="gyn_max_nr" value="<?php echo $gyn_options['gyn_max_nr']; ?>"/></td>              
+			</tr>
+			<tr>
+			  <td><strong><?php _e('Available numbers', 'get-your-number'); ?> (<?php echo count( $gyn_options['gyn_available_numbers'] ); ?>)</strong></td>
+			  <td><?php echo implode(", ", $gyn_options['gyn_available_numbers']); ?></td>              
 			</tr>
 			<tr>
 			  <td><strong><?php _e('Event name', 'get-your-number') ?></strong></td>
