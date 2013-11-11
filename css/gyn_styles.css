@@ -6,6 +6,19 @@
 	width: 100%;
 }
 
+.gyn-label {
+	font-weight:bold;
+	color: #4C4C4C;
+}
+
+.gyn-alert {
+	color: #00AC1A;
+}
+
+td.gyn-warning {
+	color: #FC9292;
+}
+
 td.form-field-label {
 	width: 20%;
 }
@@ -14,10 +27,6 @@ td.form-field-label {
 .gyn-admin-warning-table,
 .admin-settings-box {
 	margin: 10px 0;
-}
-
-.widefat td.alert {
-	color: #FF0000;
 }
 
 .widefat td.wrap-it {

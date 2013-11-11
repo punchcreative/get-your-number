@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Get your number
  * Plugin URI: https://github.com/punchcreative/get-your-number
- * Description: A random number generator for subscribing to an event with a limited number of participants. It provides the possibility of attending to a limited event for subscribers, even if they are not the fisrt with subscribing. See the plugin site (@github) for a more detailed description.
+ * Description: A random number generator as an assist for subscribing to an event with a limited number of participants. See the plugin site for a more detailed description.
  * Version: 1.1 beta
  * Author: Erik Kroon | Punch Creative
  * Author URI: http://www.punchcreative.nl
@@ -43,6 +43,14 @@
 		require plugin_dir_path( __FILE__ ) . 'inc/gyn_admin_functions.php';
 	}
 	
+	/*
+	 * Punch Creative development tools
+	 * use tj( $var ) or tj_log( $var )
+	*/
+	if ( GYNBUG ) {
+		require plugin_dir_path( __FILE__ ) . 'inc/punch_dev_functions.php';
+	}
+	
 	/*************************************************
 	 * functions that runs at activation of the plugin
 	*/
@@ -52,7 +60,7 @@
 			$new_options['gyn_version'] = VERSION;
 			$new_options['gyn_admin_email'] = get_option( 'admin_email' );
 			$new_options['gyn_min_nr'] = '1';
-			$new_options['gyn_max_nr'] = '100';
+			$new_options['gyn_max_nr'] = '90';
 			$new_options['gyn_event_name'] = __( 'Event name' , 'get-your-number');;
 			$new_options['gyn_given_numbers'] = array();
 			$new_options['gyn_available_numbers'] = range( $new_options['gyn_min_nr'], $new_options['gyn_max_nr'] );
@@ -102,20 +110,6 @@
 	 * register styles used by the plugin
 	*/	
 	function gyn_styles() {
-		// if you want to use bootstrap for this plugin remove slashes in front of the version you prefer
-		// you will have to add/modify the desired classes in the shortcode tables
-		/*
-		if( ( ! wp_style_is( 'bootstrap', 'queue' ) ) && ( ! wp_style_is( 'bootstrap', 'done' ) ) ) {
-			//queue up bootstrap_css 2.3.2 file from CDN
-			wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css' );
-			wp_enqueue_style( 'bootstrap_css' );
-			
-			// load bootstrap_css 3.0.0 file from CDN
-			//wp_register_style( 'bootstrap_css', '//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css' );
-			//wp_enqueue_style( 'bootstrap_css' );
-		}
-		*/
-		
 		// fontawesome is used in the shortcode tables for displaying asterisk
 		// you can disable this if you prefer		
 		wp_register_style( 'fontawesome_css' , '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css' );
@@ -164,12 +158,12 @@
 		global $gyn_user_email;
 		
 		if ( isset($_POST['gyn_form_nonce']) && wp_verify_nonce( $_POST['gyn_form_nonce'], 'gyn_number_request_form' ) ) {
+			// load settings
+			$gyn_options = get_option( 'gyn_options' );
 			// check if name and email aren't empty
-			if ( !empty( $_POST['name'] ) && !empty( $_POST['email'] ) ) {
-				$gyn_user_name = $_POST['name'];
-				$gyn_user_email = $_POST['email'];
-				// load settings
-				$gyn_options = get_option( 'gyn_options' );
+			if ( !empty( $_POST['gyn_name'] ) && !empty( $_POST['gyn_email'] ) && $_POST['gyn_nospam'] == $gyn_options['gyn_event_name'] ) {
+				$gyn_user_name = $_POST['gyn_name'];
+				$gyn_user_email = $_POST['gyn_email'];
 				// check if the email adres is already saved in the options for gyn
 				// used the extended in_array function to search in multidimensional arrays
 				if ( !in_array_r( $gyn_user_email, $gyn_options['gyn_given_numbers'] ) ) {
@@ -193,7 +187,16 @@
 					$gyn_form_checked = __( 'It seems you already got a number.' , 'get-your-number' );
 				}
 			} else {
-				$gyn_form_checked = __('Failed attempt', 'get-your-number');
+				unset( $gyn_form_checked );
+				if ( empty( $_POST['gyn_name'] ) || empty( $_POST['gyn_email'] ) ) {
+					// email or name is empty
+					$gyn_form_error = __('Required fields are empty!', 'get-your-number');
+				}
+				if ( $_POST['gyn_nospam'] != $gyn_options['gyn_event_name'] ) {
+					// email or name is empty
+					$gyn_form_error = __('Wrong access code!', 'get-your-number');
+				}
+				
 			}
 		} 
 	}
@@ -222,8 +225,7 @@
 		global $gyn_options;
 		
 		$gyn_options = get_option( 'gyn_options' );
-		
-		$html = $gyn_form_checked . ' ';
+		$html = '';
 		
 		// check if there are still numbers available else display the form for registration
 		if ( count( $gyn_options['gyn_available_numbers'] ) == 0 ) {
@@ -235,78 +237,83 @@
 				<p>' . __( 'Subscription is closed', 'get-your-number') . '</p>
 				</div>
 			</div>';
-		}
-		
-		if ( isset( $gyn_form_checked ) ) {
-			$key = recursive_array_search( $_POST['email'], $gyn_options['gyn_given_numbers'] );
-			$html .= '<div class="row-fluid">
-				<div class="header">
-					<h3 class="text-success">' . __( 'This is your number' , 'get-your-number' ) . '</h3>
-				</div>
-				<div class="span12">
-				<table class="table table-bordered">
-					<tbody>
-						<tr>
-							<th><label for="name">' . __('Name', 'get-your-number') . '</label></th>
-							<td>' . $gyn_options['gyn_given_numbers'][$key][0] .'</td>
-						</tr>
-						<tr>
-							<th><label for="email">' . __('Email', 'get-your-number') . '</i></label></th>
-							<td>' . $gyn_options['gyn_given_numbers'][$key][2] .'</td>
-						</tr>
-						<tr>
-							<th><label for="number">' . __('Your number', 'get-your-number') . '</label></th>
-							<td>' . $gyn_options['gyn_given_numbers'][$key][1] . '</td>
-						</tr>
-						<tr>
-							<th></th>
-							<td class="text-success">' . $gyn_form_checked . '</td>
-						</tr>
-					</tbody>
-				</table>
-				</div>
-			</div>';
 		} else {
-			$html .= '<script>
-				  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );
-				</script>
-				<div class="row-fluid">
-				<div class="header">
-					<h3 class="text-success">' . __('Get your number', 'get-your-number') . '</h3>
-				</div>
-				<div class="span12">
-				<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
-				<!-- Nonce fields to verify visitor provenance -->
-				' .  wp_nonce_field( "gyn_number_request_form", "gyn_form_nonce" ) . '
-				<table class="table table-bordered">
-					<tbody>
-						<tr>
-							<th><label for="name">' . __('Name', 'get-your-number') . ' <i class="icon-asterisk"></label></th>
-							<td><input id="name" type="text" name="name" class="formfield" required /></i></td>
-						</tr>
-						<tr>
-							<th><label for="email">' . __('Email', 'get-your-number') . ' <i class="icon-asterisk"></i></label></th>
-							<td><input id="email" type="email" name="email" class="formfield" required /></td>
-						</tr> 
-						<tr>
-							<th>&nbsp;</th>
-							<td>
-								<button type="submit" class="btn">' . __('Send me my number', 'get-your-number') . ' <i class="icon-gift icon-white"></i> </button>
-								<input type="hidden" name="gyn_event" value="' . $gyn_options['gyn_event_name'] . '" />
-							</td>
-
-						</tr>
-						<tr>
-							<th></th>
-							<td><i class="icon-asterisk"></i> ' . __('In order to get your number you must share your name and email', 'get-your-number') . '.</td>
-						</tr>
-					</tbody>
-				</table>
-				</form>
-				</div>
-			</div>';
+			// form is received and checked
+			if ( isset( $gyn_form_checked ) ) {
+				$key = recursive_array_search( $_POST['gyn_email'], $gyn_options['gyn_given_numbers'] );
+				$html .= '<div class="header">
+						<h3 class="text-success">' . __( 'This is your number' , 'get-your-number' ) . '</h3>
+					</div>
+					<div class="span12">
+					<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th><label for="name">' . __('Name', 'get-your-number') . '</label></th>
+								<td>' . $gyn_options['gyn_given_numbers'][$key][0] .'</td>
+							</tr>
+							<tr>
+								<th><label for="email">' . __('Email', 'get-your-number') . '</i></label></th>
+								<td>' . $gyn_options['gyn_given_numbers'][$key][2] .'</td>
+							</tr>
+							<tr>
+								<th><label for="number">' . __('Your number', 'get-your-number') . '</label></th>
+								<td>' . $gyn_options['gyn_given_numbers'][$key][1] . '</td>
+							</tr>
+							<tr>
+								<th></th>
+								<td class="text-success">' . $gyn_form_checked . '</td>
+							</tr>
+						</tbody>
+					</table>
+					</div>';
+			} else {
+				// form is received and checked
+				$html .= '<script>
+					  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );
+					</script>
+					<div class="header">
+						<h3 class="text-success">' . __('Get your number', 'get-your-number') . '</h3>
+					</div>
+					<div class="span12">
+					<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
+					<!-- Nonce fields to verify visitor provenance -->
+					' .  wp_nonce_field( "gyn_number_request_form", "gyn_form_nonce" ) . '
+					<table class="table table-bordered">
+						<tbody>
+							<tr>
+								<th><label for="gyn_name">' . __('Name', 'get-your-number') . ' <i class="icon-asterisk"></label></th>
+								<td><input id="gyn_name" type="text" name="gyn_name" class="formfield" value="' . (isset( $gyn_form_error ) ? $_POST['gyn_name'] : '') . '" required /></i></td>
+							</tr>
+							<tr>
+								<th><label for="gyn_email">' . __('Email', 'get-your-number') . ' <i class="icon-asterisk"></i></label></th>
+								<td><input id="gyn_email" type="email" name="gyn_email" class="formfield" value="' . (isset( $gyn_form_error ) ? $_POST['gyn_email'] : '') . '" required /></td>
+							</tr> 
+							<tr>
+								<th><label for="gyn_nospam">' . __('Access code', 'get-your-number') . ' <i class="icon-asterisk"></i><i class="icon-asterisk"></i></label></th>
+								<td><input id="gyn_nospam" type="text" name="gyn_nospam" class="formfield" placeholder="' . $gyn_options['gyn_event_name'] . '" required /></td>
+							</tr> 
+							<tr>
+								<th><i class="icon-asterisk"></i></th>
+								<td>' . __('In order to get your number you must share your name and email', 'get-your-number') . '.</td>
+							</tr> 
+							<tr>
+								<th><i class="icon-asterisk"></i></label><i class="icon-asterisk"></th>
+								<td colspan="2">' . __('Fill in the same as you see as a placeholder.', 'get-your-number') . ' </td>
+							</tr> 
+							<tr>
+								<th>&nbsp;</th>
+								<td>
+									<button type="submit" class="btn">' . __('Send me my number', 'get-your-number') . ' <i class="icon-gift icon-white"></i> </button>
+									<input type="hidden" name="gyn_event" value="' . $gyn_options['gyn_event_name'] . '" />
+								</td>
+	
+							</tr>
+						</tbody>
+					</table>
+					</form>
+					</div>';
+			}
 		}
-
 		echo $html;
 	}
 	

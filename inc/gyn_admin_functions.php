@@ -141,24 +141,24 @@ function gyn_plugin_meta_box( $gyn_options ) {
 	<table class="widefat gyn-reg-users-table" id="reg_users" >
 		<tbody>
 			<tr>
-			  <td class="form-field-label" ><strong><?php _e('Admin email', 'get-your-number'); ?></strong></td>
+			  <td class="gyn-label form-field-label" ><?php _e('Admin email', 'get-your-number'); ?></td>
 			  <td><input type="text" name="gyn_admin_email" value="<?php echo $gyn_options['gyn_admin_email']; ?>"/></td>              
 			</tr>
 			<tr>
-			  <td><strong><?php _e('Start number', 'get-your-number'); ?></strong></td>
+			  <td class="gyn-label form-field-label"><?php _e('Start number', 'get-your-number'); ?></td>
 			  <td><input type="text" name="gyn_min_nr" value="<?php echo $gyn_options['gyn_min_nr']; ?>"/></td>              
 			</tr>
 			<tr>
-			  <td><strong><?php _e('End number', 'get-your-number'); ?></strong></td>
+			  <td class="gyn-label form-field-label"><?php _e('End number', 'get-your-number'); ?></td>
 			  <td><input type="text" name="gyn_max_nr" value="<?php echo $gyn_options['gyn_max_nr']; ?>"/></td>              
 			</tr>
 			<tr>
-			  <td><strong><?php _e('Available numbers', 'get-your-number'); ?> (<?php echo count( $gyn_options['gyn_available_numbers'] ); ?>)</strong></td>
+			  <td class="gyn-label form-field-label"><?php _e('Available numbers', 'get-your-number'); ?> (<?php echo count( $gyn_options['gyn_available_numbers'] ); ?>)</td>
 			  <td><?php echo implode(", ", $gyn_options['gyn_available_numbers']); ?></td>              
 			</tr>
 			<tr>
-			  <td><strong><?php _e('Event name', 'get-your-number') ?></strong></td>
-			  <td><input type="text" name="gyn_event_name" value="<?php echo $gyn_options['gyn_event_name']; ?>"/>
+			  <td class="gyn-label form-field-label"><?php _e('Event name', 'get-your-number') ?></td>
+			  <td><input type="text" name="gyn_event_name" value="<?php echo $gyn_options['gyn_event_name']; ?>"/> <span class="gyn-alert"><?php _e( 'Subscribers will have to fill this in in the field access code when they register. This done to prevent spam.' , 'get-your-number' ); ?> </span>
             	<input type="hidden" name="gyn_version" value="<?php echo VERSION; ?>" />
             	<!-- <input type="hidden" name="gyn_given_numbers" value="" /> --></td>              
 			</tr>
@@ -166,7 +166,7 @@ function gyn_plugin_meta_box( $gyn_options ) {
 	</table>
 	<table class="widefat gyn-admin-warning-table" id="admin-warnings">
        <tr> 
-       		<td class="alert"><strong><?php _e('WARNING! Changing the settings will also clear the saved registrations!', 'get-your-number'); ?></strong></td>
+       		<td class="gyn-warning"><?php _e('WARNING! Changing the settings will also clear the saved registrations!', 'get-your-number'); ?></td>
        <tr>
     </table>
 	<input type="submit" value="<?php _e( 'Save changes', 'get-your-number'); ?>" class="button-primary"/>
@@ -233,8 +233,5 @@ function gyn_plugin_help_faq() {
 	echo "<p>" . __('At this moment there are no most frequently asked questions about this plugin.', 'get-your-number') . "</p>";
 }
 
-/**
- * function called after admin changes settings and want to save them
-*/
 
 ?>

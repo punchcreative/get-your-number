@@ -47,10 +47,10 @@ function in_array_r($needle, $haystack, $strict = true) {
     return false;
 }
 
-function recursive_array_search($needle,$haystack, $strict = true) {
+function recursive_array_search($needle,$haystack) {
     foreach($haystack as $key=>$value) {
         $current_key=$key;
-        if($needle===$value OR (is_array($value) && recursive_array_search($needle,$value, $strict) !== false)) {
+        if($needle===$value OR (is_array($value) && recursive_array_search($needle,$value) !== false)) {
             return $current_key;
         }
     }
@@ -107,4 +107,5 @@ function gyn_mailer( $name, $email, $number, $from_name, $eventname ) {
 		return $gyn_mail_message;
 	}
 }
+
 ?>
