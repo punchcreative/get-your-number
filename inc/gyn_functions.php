@@ -16,7 +16,13 @@ function gyn_generate_unique_number( $name, $email) {
 	
 	// check if there are still numbers available
 	if ( count( $arr ) >  0 ) {
-		$key = mt_rand( 0, count( $arr ) -1 );
+		
+		if ( count( $arr ) != 1 ) {
+			$key = mt_rand( 0, count( $arr ) -1 );
+		} else {
+			$key = 0;
+		}
+		
 		$nr = $arr[$key];	
 		
 		unset($arr[$key]);

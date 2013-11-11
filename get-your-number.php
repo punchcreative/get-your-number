@@ -24,7 +24,10 @@
 */
 	global $gyn_options;
 	global $gyn_form_checked;
+	global $gyn_form_error;
 	global $gyn_the_nr;
+	global $gyn_user_name;
+	global $gyn_user_email;
 	
 	// version number to be used in the plugin files
 	define( 'VERSION', '1.1' );
@@ -152,6 +155,7 @@
 	*/
 	function gyn_post_variables() {
 		global $gyn_form_checked;
+		global $gyn_form_error;
 		global $gyn_the_nr;
 		global $gyn_options;
 		global $gyn_user_name;
@@ -183,12 +187,13 @@
 					// an entry with the subscribers email already exists, let's find it
 					$key = recursive_array_search( $gyn_user_email, $gyn_options['gyn_given_numbers'] );
 					// and display it
-					$gyn_the_nr = $key;
+					$gyn_the_nr = $gyn_options['gyn_given_numbers'][$key][1];
 					$gyn_form_checked = __( 'It seems you already got a number.' , 'get-your-number' );
+					$gyn_form_error = $gyn_options['gyn_given_numbers'][$key][0] . ' ' .__('has already received number', 'get-your-number') . '.';
 				}
 			} else {
 				unset( $gyn_form_checked );
-				if ( empty( $_POST['gyn_name'] ) || empty( $_POST['gyn_email'] ) ) {
+				if ( empty( $_POST['gyn_email'] ) || empty( $_POST['gyn_email'] ) ) {
 					// email or name is empty
 					$gyn_form_error = __('Required fields are empty!', 'get-your-number');
 				}
@@ -221,6 +226,7 @@
 	*/
 	function display_gyn() {		
 		global $gyn_form_checked;
+		global $gyn_form_error;
 		global $gyn_the_nr;
 		global $gyn_options;
 		
@@ -228,7 +234,7 @@
 		$html = '';
 		
 		// check if there are still numbers available else display the form for registration
-		if ( count( $gyn_options['gyn_available_numbers'] ) == 0 ) {
+		if ( count( $gyn_options['gyn_available_numbers'] ) == 0 && !isset( $gyn_form_checked ) ) {
 			$html .= '<div class="row-fluid">
 				<div class="header">
 					<h3 class="text-success">' . __( 'All numbers are taken, sorry!' , 'get-your-number') . '</h3>
@@ -240,9 +246,17 @@
 		} else {
 			// form is received and checked
 			if ( isset( $gyn_form_checked ) ) {
+				
+				if ( isset( $gyn_form_error ) ) {
+					$gyn_form_header = $gyn_form_error;
+					unset( $gyn_form_error );
+				} else {
+					$gyn_form_header = __( 'This is your number' , 'get-your-number' );
+				}
+				
 				$key = recursive_array_search( $_POST['gyn_email'], $gyn_options['gyn_given_numbers'] );
 				$html .= '<div class="header">
-						<h3 class="text-success">' . __( 'This is your number' , 'get-your-number' ) . '</h3>
+						<h3 class="text-success">' . $gyn_form_header . '</h3>
 					</div>
 					<div class="span12">
 					<table class="table table-bordered">
@@ -268,11 +282,28 @@
 					</div>';
 			} else {
 				// form is received and checked
+				if ( !isset( $_POST['gyn_name'] ) ) {
+					$gyn_user_name = '';
+				} else {
+					$gyn_user_name = $_POST['gyn_name'];
+				}
+				if ( !isset( $_POST['gyn_email'] ) ) {
+					$gyn_user_email = '';
+				} else {
+					$gyn_user_email = $_POST['gyn_email'];
+				}
+				if ( isset( $gyn_form_error ) ) {
+					$gyn_form_header = $gyn_form_error;
+					unset( $gyn_form_error );
+				} else {
+					$gyn_form_header = __('Get your number', 'get-your-number');
+				}
+				
 				$html .= '<script>
 					  jQuery(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );
 					</script>
 					<div class="header">
-						<h3 class="text-success">' . __('Get your number', 'get-your-number') . '</h3>
+						<h3 class="text-success">' . $gyn_form_header . '</h3>
 					</div>
 					<div class="span12">
 					<form action=""  id="gyn_form" name="send_number" method="post" onsubmit="return validateForm()" >
@@ -282,15 +313,15 @@
 						<tbody>
 							<tr>
 								<th><label for="gyn_name">' . __('Name', 'get-your-number') . ' <i class="icon-asterisk"></label></th>
-								<td><input id="gyn_name" type="text" name="gyn_name" class="formfield" value="' . (isset( $gyn_form_error ) ? $_POST['gyn_name'] : '') . '" required /></i></td>
+								<td><input id="gyn_name" type="text" name="gyn_name" class="formfield" value="' . $gyn_user_name . '" required /></i></td>
 							</tr>
 							<tr>
 								<th><label for="gyn_email">' . __('Email', 'get-your-number') . ' <i class="icon-asterisk"></i></label></th>
-								<td><input id="gyn_email" type="email" name="gyn_email" class="formfield" value="' . (isset( $gyn_form_error ) ? $_POST['gyn_email'] : '') . '" required /></td>
+								<td><input id="gyn_email" type="email" name="gyn_email" class="formfield" value="' . $gyn_user_email . '" required /></td>
 							</tr> 
 							<tr>
 								<th><label for="gyn_nospam">' . __('Access code', 'get-your-number') . ' <i class="icon-asterisk"></i><i class="icon-asterisk"></i></label></th>
-								<td><input id="gyn_nospam" type="text" name="gyn_nospam" class="formfield" placeholder="' . $gyn_options['gyn_event_name'] . '" required /></td>
+								<td><input id="gyn_nospam" type="text" name="gyn_nospam" class="formfield" placeholder="' . __( 'Enter this value in here','get-your-number') . ': ' . $gyn_options['gyn_event_name'] . '" required /></td>
 							</tr> 
 							<tr>
 								<th><i class="icon-asterisk"></i></th>

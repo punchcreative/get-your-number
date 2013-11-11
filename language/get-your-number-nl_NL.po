@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Get Your Number\n"
-"POT-Creation-Date: 2013-11-10 17:08+0100\n"
-"PO-Revision-Date: 2013-11-10 17:09+0100\n"
-"Last-Translator: Erik Kroon <mail@punchcreative.nl>\n"
+"POT-Creation-Date: 2013-11-11 19:17+0100\n"
+"PO-Revision-Date: 2013-11-11 19:21+0100\n"
+"Last-Translator: Punch Creative <mail@punchcreative>\n"
 "Language-Team: Punch Creative <mail@punchcreative.nl>\n"
 "Language: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -15,103 +15,134 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: get-your-number.php:56 inc/gyn_admin_functions.php:155
+#: get-your-number.php:67 inc/gyn_admin_functions.php:160
 msgid "Event name"
 msgstr "Naam evenement"
 
-#: get-your-number.php:185 get-your-number.php:231
+#: get-your-number.php:184 get-your-number.php:240
 msgid "All numbers are taken, sorry!"
 msgstr "Alle nummers zijn al vergeven, sorry!"
 
-#: get-your-number.php:192
+#: get-your-number.php:191
 msgid "It seems you already got a number."
 msgstr "Je hebt eerder je nummer al ontvangen."
 
-#: get-your-number.php:195 get-your-number.php:228
-msgid "Failed attempt"
-msgstr "Mislukte poging"
+#: get-your-number.php:192
+msgid "has already received number"
+msgstr "heeft dit nummer al ontvangen"
 
-#: get-your-number.php:234
+#: get-your-number.php:198
+msgid "Required fields are empty!"
+msgstr "Verplichte velden zijn leeg!"
+
+#: get-your-number.php:202
+msgid "Wrong access code!"
+msgstr "Verkeerde toegangs code ingevoerd"
+
+#: get-your-number.php:243
 msgid "Subscription is closed"
 msgstr "De inschrijving is gesloten"
 
-#: get-your-number.php:243
+#: get-your-number.php:254
 msgid "This is your number"
 msgstr "Dit is je nummer"
 
-#: get-your-number.php:249 get-your-number.php:283
-#: inc/gyn_admin_functions.php:178 inc/gyn_admin_functions.php:185
-#: inc/gyn_functions.php:103
+#: get-your-number.php:265 get-your-number.php:315
+#: inc/gyn_admin_functions.php:183 inc/gyn_admin_functions.php:190
+#: inc/gyn_functions.php:102
 msgid "Name"
 msgstr "Naam"
 
-#: get-your-number.php:253 get-your-number.php:287
-#: inc/gyn_admin_functions.php:180 inc/gyn_admin_functions.php:187
-#: inc/gyn_functions.php:103
+#: get-your-number.php:269 get-your-number.php:319
+#: inc/gyn_admin_functions.php:185 inc/gyn_admin_functions.php:192
+#: inc/gyn_functions.php:102
 msgid "Email"
 msgstr "Email"
 
-#: get-your-number.php:257
+#: get-your-number.php:273
 msgid "Your number"
 msgstr "Jouw nummer"
 
-#: get-your-number.php:274
+#: get-your-number.php:299
 msgid "Get your number"
 msgstr "Vraag je nummer aan"
 
-#: get-your-number.php:293
-msgid "Send me my number"
-msgstr "Stuur me mijn nummer"
+#: get-your-number.php:323
+msgid "Access code"
+msgstr "Toegangs code"
 
-#: get-your-number.php:300
+#: get-your-number.php:324
+msgid "Enter this value in here"
+msgstr "Voer dit hier in"
+
+#: get-your-number.php:328
 msgid "In order to get your number you must share your name and email"
 msgstr "Om een nummer te krijgen moet je je naam en email invoeren"
+
+#: get-your-number.php:332
+msgid "Fill in the same as you see as a placeholder."
+msgstr "Voer hier in wat je als voorbeeld ziet staan."
+
+#: get-your-number.php:337
+msgid "Send me my number"
+msgstr "Stuur me mijn nummer"
 
 #: inc/gyn_admin_functions.php:55
 msgid "No permission for you to change options"
 msgstr "Geen rechten om instellingen aan te passen"
 
-#: inc/gyn_admin_functions.php:94
+#: inc/gyn_admin_functions.php:95
 msgid "GYN settings | GYN version"
 msgstr "GYN instellingen | GYN versie"
 
-#: inc/gyn_admin_functions.php:143
+#: inc/gyn_admin_functions.php:144
 msgid "Admin email"
 msgstr "Beheerders email"
 
-#: inc/gyn_admin_functions.php:147
+#: inc/gyn_admin_functions.php:148
 msgid "Start number"
 msgstr "Start nummer"
 
-#: inc/gyn_admin_functions.php:151
+#: inc/gyn_admin_functions.php:152
 msgid "End number"
 msgstr "Eind nummer"
 
-#: inc/gyn_admin_functions.php:164
+#: inc/gyn_admin_functions.php:156
+msgid "Available numbers"
+msgstr "Beschikbare nummers"
+
+#: inc/gyn_admin_functions.php:161
+msgid ""
+"Subscribers will have to use this name in the field access code when they "
+"register. This is done to prevent spam."
+msgstr ""
+"Bezoekers die zich aanmelden moeten deze naam overnemen in het veld toegangs "
+"code als ze zich inschrijven. Dit om spam tegen te gaan."
+
+#: inc/gyn_admin_functions.php:169
 msgid "WARNING! Changing the settings will also clear the saved registrations!"
 msgstr ""
 "WAARSCHUWING! Als je de instellingen aanpast en opslaat wis je ook de "
 "opgeslagen inschrijvingen!"
 
-#: inc/gyn_admin_functions.php:167
-#, fuzzy
+#: inc/gyn_admin_functions.php:172
 msgid "Save changes"
 msgstr "Sla instellingen op"
 
-#: inc/gyn_admin_functions.php:179 inc/gyn_admin_functions.php:186
-#: inc/gyn_functions.php:103
+#: inc/gyn_admin_functions.php:184 inc/gyn_admin_functions.php:191
+#: inc/gyn_functions.php:102
 msgid "Number"
 msgstr "Nummer"
 
-#: inc/gyn_admin_functions.php:219
+#: inc/gyn_admin_functions.php:224
 msgid "Main Settings"
 msgstr "Basis instellingen"
 
-#: inc/gyn_admin_functions.php:220
+#: inc/gyn_admin_functions.php:225
 msgid "Overview of subscribers"
 msgstr "Overzicht van registraties"
 
-#: inc/gyn_admin_functions.php:224
+#: inc/gyn_admin_functions.php:229
 msgid ""
 "The plugin works with a shortcode. In a post or page you can use [gyn/] to "
 "display a form where subscribers can leave their name and email to get their "
@@ -132,43 +163,46 @@ msgstr ""
 "bericht of de pagina met de shortcode publiceert alle instellingen goed hebt "
 "staan. Succes met de bingo."
 
-#: inc/gyn_admin_functions.php:228
+#: inc/gyn_admin_functions.php:233
 msgid ""
 "At this moment there are no most frequently asked questions about this "
 "plugin."
 msgstr "Er zijn geen veel gestelde vragen op dit moment."
 
-#: inc/gyn_functions.php:81
+#: inc/gyn_functions.php:80
 msgid "Get your number admin"
 msgstr "Beheerder | Krijg je nummer"
 
-#: inc/gyn_functions.php:101
+#: inc/gyn_functions.php:100
 msgid "Your subscription number is "
 msgstr "Je nummer is"
 
-#: inc/gyn_functions.php:103
+#: inc/gyn_functions.php:102
 msgid "Dear"
 msgstr "Beste"
 
-#: inc/gyn_functions.php:103
+#: inc/gyn_functions.php:102
 msgid "is your subscription number for the event"
 msgstr "is jouw nummer voor het evenement"
 
-#: inc/gyn_functions.php:103
+#: inc/gyn_functions.php:102
 msgid "You will soon be informed if you have a lucky number"
 msgstr "Je hoort snel of je een geluksnummer hebt"
 
-#: inc/gyn_functions.php:103
+#: inc/gyn_functions.php:102
 msgid "Thank you for subscribing"
 msgstr "Bedankt voor je inschrijving"
 
-#: inc/gyn_functions.php:110
+#: inc/gyn_functions.php:108
 msgid "An email has been sent to you to confirm your subscription"
 msgstr "Je hebt een email ontvangen ter bevestiging"
 
-#: inc/gyn_functions.php:114
+#: inc/gyn_functions.php:110
 msgid "Sending an email failed, please remember your number"
 msgstr "Het sturen van een email is mislukt onthoud s.v.p. je nummer"
+
+#~ msgid "Failed attempt"
+#~ msgstr "Mislukte poging"
 
 #~ msgid "Retreive your number"
 #~ msgstr "Vraag je nummer aan"

@@ -158,7 +158,7 @@ function gyn_plugin_meta_box( $gyn_options ) {
 			</tr>
 			<tr>
 			  <td class="gyn-label form-field-label"><?php _e('Event name', 'get-your-number') ?></td>
-			  <td><input type="text" name="gyn_event_name" value="<?php echo $gyn_options['gyn_event_name']; ?>"/> <span class="gyn-alert"><?php _e( 'Subscribers will have to fill this in in the field access code when they register. This done to prevent spam.' , 'get-your-number' ); ?> </span>
+			  <td><input type="text" name="gyn_event_name" value="<?php echo $gyn_options['gyn_event_name']; ?>"/> <span class="gyn-alert"><?php _e( 'Subscribers will have to use this name in the field access code when they register. This is done to prevent spam.' , 'get-your-number' ); ?> </span>
             	<input type="hidden" name="gyn_version" value="<?php echo VERSION; ?>" />
             	<!-- <input type="hidden" name="gyn_given_numbers" value="" /> --></td>              
 			</tr>
