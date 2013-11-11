@@ -345,7 +345,7 @@
 					</div>';
 			}
 		}
-		echo $html;
+		return $html;
 	}
 	
 	add_shortcode("gyn", "display_gyn");
