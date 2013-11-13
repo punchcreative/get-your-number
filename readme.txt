@@ -39,6 +39,10 @@ None yet
 
 == Screenshots ==
 
+1. Settings screen for Get your number (GYN)
+2. A page representing the GYN form (which is used as shortcode [gyn/])
+3. Feedback after the user subscribed to the event
+4. Settigns screen with subscriptions
 
 == Changelog ==
 
