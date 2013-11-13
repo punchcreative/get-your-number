@@ -8,7 +8,7 @@ Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This is a Wordpress plugin to help with subscription to an event with a maximum of participants but a lot more people who are willing to participate. The plugin gives each subscriber a unique number, like a lottery. The numbers are generated within a range you can set in the admin settings for this plugin.
+The plugin generates and sends subscribers a unique number within a range you can set.
 
 == Description ==
 
