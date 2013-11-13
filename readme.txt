@@ -17,12 +17,13 @@ This is a Wordpress plugin to help with subscription to an event with a maximum 
 * set a range of numbers which largely overrides the amount of available places in the event (in my example i know the association has 100 members so i choose a range from 1 to 100, knowing not everyone is going to subscribe this is a safe range)
 * let people subscribe using their name and email
 * after registration, mail the subscriber, and the GYN administrator, the random and unique number that has been given
-* if a person has subscribed the name, number and email is logged in the Wordpress options table. If a subscribers email is found in the options table, it's not possible to request another number. The subscriber get's the number presented that's already sent.
+
+If a person has subscribed the name, number and email is logged in the Wordpress options table. If a subscribers email is found in the options table, it's not possible to request another number. The subscriber get's the number presented that's already sent.
 
 After you close the subscription, you can decide on how to make use of the numbers that are given.
 
 Install the plugin in a folder named get-your-number in your Wordpress plugins directory
-You van translate it to your prefered language (poedit) and save your translation in the languages folder of the plugin. Do not forget to put 'ge-your-number' in front of the language identifier (e.g. get-your-number-nl_NL.po)
+You can translate it to your prefered language (poedit) and save your translation in the languages folder of the plugin. Do not forget to put 'ge-your-number' in front of the language identifier (e.g. get-your-number-nl_NL.po)
 
 Playing a Bingo could be one ;-)
 

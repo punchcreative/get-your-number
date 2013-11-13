@@ -15,6 +15,7 @@ If a person has subscribed the name, number and email is logged in the Wordpress
 
 After you close the subscription, you can decide on how to make use of the numbers that are given.
 
-Install the plugin in a folder named <strong>get-your-number</strong> in your Wordpress plugins directory
+Install the plugin in a folder named <strong>get-your-number</strong> in your Wordpress plugins directory.
+You can translate it to your prefered language (poedit) and save your translation in the languages folder of the plugin. Do not forget to put 'ge-your-number' in front of the language identifier (e.g. get-your-number-nl_NL.po)
 
 Playing a Bingo could be one ;-)
