@@ -16,3 +16,17 @@ js/_notes/dwsync.xml
 language/_notes/dwsync.xml
 
 language/_notes/dwsync.xml
+
+.svn/all-wcprops
+
+.svn/entries
+
+*.svn-work
+
+img/.svn/entries
+
+inc/.svn/entries
+
+js/.svn/entries
+
+language/.svn/entries
